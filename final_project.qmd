@@ -1,0 +1,15 @@
+```{r}
+library(tidyverse)
+
+# Load dataset
+load("data.rda")
+
+# See objects
+ls()
+
+# Assign correct dataset
+drug_data <- da36536.0001
+
+# Inspect
+glimpse(drug_data)
+summary(drug_data)
