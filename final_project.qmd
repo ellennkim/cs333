@@ -13,3 +13,29 @@ drug_data <- da36536.0001
 # Inspect
 glimpse(drug_data)
 summary(drug_data)
+
+
+# Create any drug use var to represent users of any drug in the dataset
+drug_data <- drug_data |>
+  mutate(
+    any_drug_use = ifelse(
+      CANNABIS != "CL0" | COKE != "CL0" | ECSTASY != "CL0",
+      "User", "Non-user"
+    )
+  )
+```
+
+```{r}
+# Create plot examining gender and drug use
+ggplot(drug_data, aes(x = GENDER, fill = any_drug_use)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Overall Drug Usage by Gender",
+    x = "Gender",
+    y = "Percent",
+    fill = "Drug Usage"
+  ) +
+  theme_minimal()
+
+```
