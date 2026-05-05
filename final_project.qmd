@@ -1,5 +1,6 @@
 ```{r}
 library(tidyverse)
+library(ggplot2)
 
 # Load dataset
 load("data.rda")
@@ -37,5 +38,21 @@ ggplot(drug_data, aes(x = GENDER, fill = any_drug_use)) +
     fill = "Drug Usage"
   ) +
   theme_minimal()
+
+```
+
+```{r}
+# Create plot examining education and drug use
+ggplot(drug_data, aes(x = EDUCATION, fill = any_drug_use)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Overall Drug Usage by Education Level",
+    x = "Education Level",
+    y = "Percent",
+    fill = "Drug Usage"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
