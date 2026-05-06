@@ -56,3 +56,26 @@ ggplot(drug_data, aes(x = EDUCATION, fill = any_drug_use)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+```{r}
+# Create plot examining age and drug use
+ggplot(drug_data, aes(x = AGE, fill = any_drug_use)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_discrete(labels = c(
+    "Ag1" = "18-24",
+    "Ag2" = "25 -34", 
+    "Ag3" = "35 - 44", 
+    "Ag4" = "45 - 54", 
+    "Ag5" = "55 - 64", 
+    "Ag6" = "65+"
+  )) +
+  labs(
+    title = "Overall Drug Usage by Age",
+    x = "Age Range",
+    y = "Percent",
+    fill = "Drug Use"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
