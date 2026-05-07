@@ -56,6 +56,7 @@ ggplot(drug_data, aes(x = EDUCATION, fill = any_drug_use)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
+
 ```{r}
 # Create plot examining age and drug use
 ggplot(drug_data, aes(x = AGE, fill = any_drug_use)) +
@@ -78,4 +79,18 @@ ggplot(drug_data, aes(x = AGE, fill = any_drug_use)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+```
+
+```{r}
+# Create plot examining sensation seeking and selected drug use
+ggplot(drug_data, aes(x = SS, fill = any_drug_use)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Drug Usage by Sensation Seeking Score",
+    x = "Sensation Seeking Score",
+    y = "Percent",
+    fill = "Drug Usage"
+  ) +
+  theme_minimal()
 ```
