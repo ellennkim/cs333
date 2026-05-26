@@ -1,0 +1,161 @@
+---
+title: Drug Usage Exploration
+format: closeread-html
+fontsize: 2em
+execute: 
+    fig-width: 15
+    fig-height: 12
+---
+
+
+<style>
+body {
+  background-color: #FAF3E0 ;
+}
+.cr-section {
+  background-color: #FFE5B4 ;
+}
+</style>
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+
+# Load dataset
+load("data.rda")
+
+# See objects
+ls()
+
+# Assign correct dataset
+drug_data <- da36536.0001
+
+# Inspect
+glimpse(drug_data)
+summary(drug_data)
+
+
+# Create any drug use var to represent users of any drug in the dataset
+drug_data <- drug_data |>
+  mutate(
+    any_drug_use = ifelse(
+      CANNABIS != "CL0" | COKE != "CL0" | ECSTASY != "CL0",
+      "User", "Non-user"
+    )
+  )
+```
+
+```{r}
+# Create plot examining gender and drug use
+plot_1 <- ggplot(drug_data, aes(x = GENDER, fill = any_drug_use)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Overall Drug Usage by Gender",
+    x = "Gender",
+    y = "Percent",
+    fill = "Drug Usage"
+  ) +
+  theme_minimal()
+
+```
+
+```{r}
+# Create plot examining education and drug use
+plot_2 <- ggplot(drug_data, aes(x = EDUCATION, fill = any_drug_use)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Overall Drug Usage by Education Level",
+    x = "Education Level",
+    y = "Percent",
+    fill = "Drug Usage"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+# Create plot examining age and drug use
+plot_3 <- ggplot(drug_data, aes(x = AGE, fill = any_drug_use)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_discrete(labels = c(
+    "Ag1" = "18-24",
+    "Ag2" = "25 -34", 
+    "Ag3" = "35 - 44", 
+    "Ag4" = "45 - 54", 
+    "Ag5" = "55 - 64", 
+    "Ag6" = "65+"
+  )) +
+  labs(
+    title = "Overall Drug Usage by Age",
+    x = "Age Range",
+    y = "Percent",
+    fill = "Drug Use"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r}
+# Create plot examining sensation seeking and selected drug use
+plot_4 <- ggplot(drug_data, aes(x = SS, fill = any_drug_use)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Drug Usage by Sensation Seeking Score",
+    x = "Sensation Seeking Score",
+    y = "Percent",
+    fill = "Drug Usage"
+  ) +
+  theme_minimal()
+```
+
+
+
+::: {.cr-section}
+
+:::{.narrative}
+Drug usage varies across age, gender, education, and personality traits. We aim to study these patterns by analyzing data from a year-long survey which collected the drug consumption habits of individuals 18 years or older. The survey questioned if respondents had consumed alcohol, amphetamines, amyl nitrite, benzodiazepine, cannabis, chocolate, cocaine, caffeine, crack, ecstasy, heroin, ketamine, legal highs, LSD, methadone, mushrooms, nicotine, and volatile substance abuse and one fictional drug (Semeron). 
+
+The following visualizations help to illustrate the data...
+:::
+
+Within the study participants, a higher percentage of the male respondents use drugs versus the female interviewees. @cr-genderplot
+
+::: {#cr-genderplot}
+```{r}
+plot_1
+```
+:::
+
+Within the recorded age ranges, the higest percentage of indviduals who utilize drugs fall in the 18-24 age range. The percentage of respondents who utilize drugs decreases with each age range, with 65+ being the lowest. @cr-ageplot
+
+::: {#cr-ageplot}
+```{r}
+plot_3
+```
+:::
+
+ The highest percentage of drug users falls in the category of attending some university or college but not obtaining a degree. Once an individual has gained a bachelors degree or higher, the percentage of drug users in these categories tend to stay around 70%. The category of those who left school at 16 years of age (Ed2) also has a similar percentage of drug users as the groups which earned a bachelors or higher. This suggests that the level of education an individual achieves can affect drug consumption, but it is not the only factor. @cr-educationplot
+
+
+::: {#cr-educationplot}
+```{r}
+plot_2
+```
+:::
+
+Add analysis here @cr-personalityplot
+
+::: {#cr-personalityplot}
+```{r}
+plot_4
+```
+:::
+
+:::
