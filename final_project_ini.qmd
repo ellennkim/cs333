@@ -17,10 +17,17 @@ body {
 }
 </style>
 
+# Section 1: Introduction/Dataset Context
+ Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness.
 
 ```{r}
+# load libraries 
 library(tidyverse)
 library(ggplot2)
+library(scales)
+library(closeread)
+library(gt)
+
 
 # Load dataset
 load("data.rda")
@@ -44,22 +51,205 @@ drug_data <- drug_data |>
       "User", "Non-user"
     )
   )
+
+  # create a small overview table describing the dataset
+  overview_tbl <- tibble(
+    Category = c(
+      "Number of respondents",
+      "Number of variables",
+      "Drug use definition",
+      "Drug variables used for current prototype",
+      "Demographic variables",
+      "Personality variables",
+      "Survey population"
+  ),
+    Description = c(
+      nrow(drug_data),
+      ncol(drug_data),
+      "User = respondent reported use of cannabis, coke, or ecstasy",
+      "Cannabis, coke, ecstasy",
+      "Age, gender, education, country, ethnicity",
+      "Neuroticism, extraversion, openness, agreeableness, conscientiousness, impulsivity, sensation seeking",
+      "Adults from English-speaking countries"
+    )
+)
+
+# create formatted table using gt package
+overview_tbl |>
+  gt() |>
+  tab_header(
+    title = "Dataset Overview",
+    subtitle = "Drug Consumption Survey Dataset"
+  ) |>
+  cols_width(
+    Category ~ px(280),
+    Description ~ px(520)
+  )
 ```
+
+This dataset contains individual survey responses about demographics, personality traits, and drug consumption. For this prototype, we define a respondent as a “User” if they reported any use of cannabis, coke, or ecstasy. This gives us a simplified outcome variable that lets us compare drug use patterns across demographic and psychological factors.
+
+# Section 2: Baseline Drug Use Patterns
+Communication Goal -> Establish the basic question: who reports drug use at all?
 
 ```{r}
-# Create plot examining gender and drug use
-plot_1 <- ggplot(drug_data, aes(x = GENDER, fill = any_drug_use)) +
-  geom_bar(position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
+  # calculate counts and percentages of users vs non-users
+overall_usage <- drug_data |>
+  # count number of respondents in each category
+  count(any_drug_use) |>
+  # create percentage column
+  mutate(
+    percent = n / sum(n)
+  )
+
+# create bar chart
+overall_usage |>
+  ggplot(
+    aes(
+      x = any_drug_use,
+      y = percent,
+      fill = any_drug_use
+    )) +
+  geom_col(width = 0.6) +
+  # add percentage labels on top of bars
+  geom_text(
+    aes(label = percent(percent, accuracy = 0.1)),
+    vjust = -0.5,
+    size = 5) +
+  scale_y_continuous(
+    labels = percent,
+    limits = c(0, 1)) +
+  scale_fill_manual(
+    values = c(
+      "User" = "#20B8C4",
+      "Non-user" = "#F07A70"
+    )) +
   labs(
-    title = "Overall Drug Usage by Gender",
-    x = "Gender",
-    y = "Percent",
-    fill = "Drug Usage"
-  ) +
-  theme_minimal()
+    title = "Overall Reported Drug Use",
+    subtitle = "Users are respondents who reported cannabis, coke, or ecstasy use",
+    x = "",
+    y = "Percent of respondents",
+    fill = "Drug usage") +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold"),
+    axis.text.x = element_text(face = "bold")
+  )
 
 ```
+
+This graph establishes the baseline distribution of drug usage within the dataset using our simplified classification system. Respondents were categorized as “Users” if they reported any cannabis, coke, or ecstasy use, while all others were labeled “Non-users.” Almost 80% of respondents fall into the “User” category, suggesting that some level of reported drug use is relatively common within this survey population. This baseline helps contextualize the demographic and personality-based patterns explored in later sections of the project.
+
+```{r}
+# Create summary table for age and drug use
+age_summary <- drug_data |>
+  mutate(
+    age_group = case_when(
+      AGE == "Ag1" ~ "18-24",
+      AGE == "Ag2" ~ "25-34",
+      AGE == "Ag3" ~ "35-44",
+      AGE == "Ag4" ~ "45-54",
+      AGE == "Ag5" ~ "55-64",
+      AGE == "Ag6" ~ "65+",
+      TRUE ~ NA_character_
+    ),
+    # keep age groups in the correct order
+    age_group = factor(
+      age_group,
+      levels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+    )
+  ) |>
+  # count users and non-users within each age group
+  count(age_group, any_drug_use) |>
+  # calculate percentage within each age group
+  group_by(age_group) |>
+  mutate(
+    percent = n / sum(n)
+  ) |>
+  ungroup()
+
+# Create plot 
+ggplot(
+  age_summary,
+  aes(
+    x = age_group,
+    y = percent,
+    fill = any_drug_use
+  )) +
+  geom_col(width = 0.75) +
+  scale_y_continuous(
+    labels = scales::percent,
+    limits = c(0, 1)) +
+  scale_fill_manual(
+    values = c(
+      "User" = "#20B8C4",
+      "Non-user" = "#F07A70"
+    )) +
+  labs(
+    title = "Drug Use Is Highest Among Younger Respondents",
+    subtitle = "Share of users and non-users within each age group",
+    x = "Age range",
+    y = "Percent of respondents",
+    fill = "Drug use") +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right"
+  )
+
+```
+
+This graph shows a strong relationship between age and reported drug use within the survey population. Respondents in the youngest age group, 18–24, had the highest share of reported drug use, with usage steadily decreasing across older age groups. By the 65+ category, non-users make up the majority of respondents. This pattern suggests that younger individuals in the dataset are substantially more likely to report drug use than older respondents, making age one of the clearest demographic trends in the project.
+
+```{r}
+# Create summary table for gender and drug use
+gender_summary <- drug_data |>
+  mutate(
+    gender = case_when(
+      GENDER == "M" ~ "Male",
+      GENDER == "F" ~ "Female",
+      TRUE ~ as.character(GENDER)
+    )
+  ) |>
+  count(gender, any_drug_use) |>
+  group_by(gender) |>
+  mutate(
+    percent = n / sum(n)
+  ) |>
+  ungroup()
+  
+# plot
+ggplot(
+  gender_summary,
+  aes(
+    x = gender,
+    y = percent,
+    fill = any_drug_use)) +
+  geom_col(width = 0.65) +
+  scale_y_continuous(
+    labels = scales::percent,
+    limits = c(0, 1)) +
+  scale_fill_manual(
+    values = c(
+      "User" = "#20B8C4",
+      "Non-user" = "#F07A70")) +
+  labs(
+    title = "Reported Drug Use Differs by Gender",
+    subtitle = "Share of users and non-users within each gender group",
+    x = "Gender",
+    y = "Percent of respondents",
+    fill = "Drug use") +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "right")
+
+```
+This graph shows noticeable differences in reported drug use across gender groups within the dataset. Male respondents report higher levels of drug use overall, with almost 90% categorized as “Users,” compared to a lower share among female respondents. While both groups contain a majority of users, the gap suggests that gender may play a role in reported drug consumption patterns. Together with the age analysis, this graph helps establish demographic trends before exploring more detailed personality-based relationships later in the project.
+
+OUTLINE ENDS HERE ---------------------------------------------------------------------------
 
 ```{r}
 # Create plot examining education and drug use
@@ -77,29 +267,6 @@ plot_2 <- ggplot(drug_data, aes(x = EDUCATION, fill = any_drug_use)) +
 
 ```
 
-```{r}
-# Create plot examining age and drug use
-plot_3 <- ggplot(drug_data, aes(x = AGE, fill = any_drug_use)) +
-  geom_bar(position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
-  scale_x_discrete(labels = c(
-    "Ag1" = "18-24",
-    "Ag2" = "25 -34", 
-    "Ag3" = "35 - 44", 
-    "Ag4" = "45 - 54", 
-    "Ag5" = "55 - 64", 
-    "Ag6" = "65+"
-  )) +
-  labs(
-    title = "Overall Drug Usage by Age",
-    x = "Age Range",
-    y = "Percent",
-    fill = "Drug Use"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
 
 ```{r}
 # Create plot examining sensation seeking and selected drug use
@@ -122,7 +289,6 @@ plot_4 <- ggplot(drug_data, aes(x = SS, fill = any_drug_use)) +
 :::{.narrative}
 Drug usage varies across age, gender, education, and personality traits. We aim to study these patterns by analyzing data from a year-long survey which collected the drug consumption habits of individuals 18 years or older. The survey questioned if respondents had consumed alcohol, amphetamines, amyl nitrite, benzodiazepine, cannabis, chocolate, cocaine, caffeine, crack, ecstasy, heroin, ketamine, legal highs, LSD, methadone, mushrooms, nicotine, and volatile substance abuse and one fictional drug (Semeron). 
 
-The following visualizations help to illustrate the data...
 :::
 
 Within the study participants, a higher percentage of the male respondents use drugs versus the female interviewees. @cr-genderplot
