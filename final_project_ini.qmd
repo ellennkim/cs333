@@ -249,6 +249,59 @@ ggplot(
 ```
 This graph shows noticeable differences in reported drug use across gender groups within the dataset. Male respondents report higher levels of drug use overall, with almost 90% categorized as “Users,” compared to a lower share among female respondents. While both groups contain a majority of users, the gap suggests that gender may play a role in reported drug consumption patterns. Together with the age analysis, this graph helps establish demographic trends before exploring more detailed personality-based relationships later in the project.
 
+```{r}
+# Create summary table for age, gender, and drug use
+age_gender_summary <- drug_data |>
+  mutate(
+    age_group = case_when(
+      AGE == "Ag1" ~ "18-24",
+      AGE == "Ag2" ~ "25-34",
+      AGE == "Ag3" ~ "35-44",
+      AGE == "Ag4" ~ "45-54",
+      AGE == "Ag5" ~ "55-64",
+      AGE == "Ag6" ~ "65+"),
+    age_group = factor(
+      age_group,
+      levels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")),
+    gender = case_when(
+      GENDER == "M" ~ "Male",
+      GENDER == "F" ~ "Female")
+  ) |>
+  count(gender, age_group, any_drug_use) |>
+  group_by(gender, age_group) |>
+  mutate(
+    percent = n / sum(n)
+  ) |>
+  ungroup()
+
+# Create age-by-gender plot
+ggplot(
+  age_gender_summary,
+  aes(x = age_group, y = percent, fill = any_drug_use)) +
+  geom_col(width = 0.75) +
+  facet_wrap(~ gender) +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+  scale_fill_manual(
+    values = c(
+      "User" = "#20B8C4",
+      "Non-user" = "#F07A70")) +
+  labs(
+    title = "Age Patterns Differ Across Gender",
+    subtitle = "Share of users and non-users within each age and gender group",
+    x = "Age range",
+    y = "Percent of respondents",
+    fill = "Drug use") +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text(face = "bold"),
+    legend.position = "right")
+
+```
+This graph combines the project’s two strongest demographic patterns: age and gender. Across both male and female respondents, reported drug use is highest among younger age groups and generally declines with age. However, the decline is more pronounced among female respondents, where the proportion of non-users increases substantially in older age categories. Male respondents consistently report higher levels of drug use across nearly every age group. By comparing both demographics simultaneously, this visualization shows that age-related patterns remain visible across genders while also highlighting an overall gender gap in reported drug use.
+
+
 OUTLINE ENDS HERE ---------------------------------------------------------------------------
 
 ```{r}
