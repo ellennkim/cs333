@@ -17,6 +17,9 @@ body {
 }
 </style>
 
+
+# Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness. 
+
 # Section 1: Introduction/Dataset Context 
 
 
@@ -86,6 +89,7 @@ overview_tbl |>
   )
 ```
 
+This dataset contains individual survey responses about demographics, personality traits, and drug consumption. For this prototype, we define a respondent as a “User” if they reported any use of cannabis, coke, or ecstasy. This gives us a simplified outcome variable that lets us compare drug use patterns across demographic and psychological factors. 
 
 <!-- # Section 2: Baseline Drug Use Patterns 
 Communication Goal -> Establish the basic question: who reports drug use at all? -->
@@ -302,9 +306,10 @@ agebygender_plot <- ggplot(
 
 ::: {.cr-section}
 
-
+:::{.narrative}
 ## Section 2: Baseline Drug Use Patterns
-## Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness. This dataset contains individual survey responses about demographics, personality traits, and drug consumption. For this prototype, we define a respondent as a “User” if they reported any use of cannabis, coke, or ecstasy. This gives us a simplified outcome variable that lets us compare drug use patterns across demographic and psychological factors. 
+## Lets establish the basic question: who reports drug use at all?
+:::
 
 
 This graph establishes the baseline distribution of drug usage within the dataset using our simplified classification system. Respondents were categorized as “Users” if they reported any cannabis, coke, or ecstasy use, while all others were labeled “Non-users.” Almost 80% of respondents fall into the “User” category, suggesting that some level of reported drug use is relatively common within this survey population. This baseline helps contextualize the demographic and personality-based patterns explored in later sections of the project. @cr-overall
@@ -339,6 +344,31 @@ This graph combines the project’s two strongest demographic patterns: age and 
 ```{r}
 agebygender_plot
 ```
+:::
+
+:::{.narrative}
+## Section 3: Education and Drug Use
+## Does social/demographic structure beyond age and gender relate to drug use?
+:::
+---- ADD graphs + analysis here (follow earlier structure) ---
+
+:::{.narrative}
+## Section 4: Which Drugs are Most Common?
+:::
+---- ADD graphs + analysis here (follow earlier structure) ---
+
+:::{.narrative}
+## Section 5: Personality Traits & Drug Use
+:::
+---- ADD graphs + analysis here (follow earlier structure) ---
+
+:::{.narrative}
+## Section 6: Personality Traits by Specific Drugs
+:::
+---- ADD graphs + analysis here (follow earlier structure) ---
+
+:::{.narrative}
+## Section 7: Conclusion
 :::
 
 
