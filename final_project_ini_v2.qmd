@@ -674,7 +674,217 @@ personality_plot
 :::{.narrative}
 ## Section 6: Personality Traits by Specific Drugs
 :::
----- ADD graphs + analysis here (follow earlier structure) ---
+
+```{r}
+# Select drugs for comparison
+selected_drug_cols <- c(
+    "CANNABIS",
+    "COKE",
+    "ECSTASY",
+    "MUSHROOMS",
+    "ALCOHOL",
+    "CAFF"
+)
+
+# Create sensation seeking by specific drug summary
+sensation_drug_summary <- drug_data |>
+    mutate(
+        sensation_score = factor(SS)
+    ) |>
+    select(
+        sensation_score,
+        all_of(selected_drug_cols)
+    ) |>
+    pivot_longer(
+        cols = all_of(selected_drug_cols),
+        names_to = "drug_name",
+        values_to = "drug_use"
+    ) |>
+    mutate(
+        drug_name = case_when(
+            drug_name == "CANNABIS" ~ "Cannabis",
+            drug_name == "COKE" ~ "Cocaine",
+            drug_name == "ECSTASY" ~ "Ecstasy",
+            drug_name == "MUSHROOMS" ~ "Mushrooms",
+            drug_name == "ALCOHOL" ~ "Alcohol",
+            drug_name == "CAFF" ~ "Caffeine",
+            TRUE ~ drug_name
+        ),
+        user_numeric = ifelse(drug_use == "CL0", 0, 1)
+    ) |>
+    group_by(sensation_score, drug_name) |>
+    summarise(
+        percent_user = mean(user_numeric),
+        .groups = "drop"
+    )
+
+# Plot
+sensation_drug_plot <- ggplot(
+    sensation_drug_summary,
+    aes(
+        x = sensation_score,
+        y = percent_user,
+        color = drug_name,
+        group = drug_name
+    )
+) +
+    geom_line() +
+    geom_point(size = 2.5) +
+    scale_y_continuous(
+        labels = scales::percent,
+        limits = c(0, 1)
+    ) +
+    labs(
+        title = "Sensation Seeking Relates More Strongly to Some Drugs Compared to Others",
+        subtitle = "Percent reporting any use across sensation-seeking scores",
+        x = "Sensation-seeking Score",
+        y = "Percent Reporting Use",
+        color = "Drug"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.title = element_text(face = "bold"), 
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      strip.text = element_text(face = "bold"),
+      legend.position = "right"
+    )
+```
+
+The previous section showed how sensation-seeking is strongly associated with overall drug use. This graph looks more closely at whether that relationship looks equal across the different substances. Instead of treating drug use as just one broad category on its own, this graph compares the reported use of cannabis, cocaine, ecstasy, mushrooms, and other substances across their sensation-seeking scores. This will show whether certain drugs rise more sharply among higher sensation-seeking respondents. @cr-sensation-drugs
+
+::: {#cr-sensation-drugs}
+```{r}
+sensation_drug_plot
+```
+
+:::
+
+```{r}
+# Create trait data in long format
+trait_long <- drug_data |>
+    mutate(
+        row_id = row_number()
+    ) |>
+    select(
+        row_id,
+        NSCORE,
+        ESCORE,
+        OSCORE,
+        ASCORE,
+        CSCORE,
+        IMPULSIVITY,
+        SS
+    ) |>
+    pivot_longer(
+        cols = -row_id,
+        names_to = "trait_name",
+        values_to = "trait_score"
+    ) |>
+    mutate(
+        trait_name = case_when(
+            trait_name == "NSCORE" ~ "Neuroticism",
+            trait_name == "ESCORE" ~ "Extraversion",
+            trait_name == "OSCORE" ~ "Openness",
+            trait_name == "ASCORE" ~ "Agreeableness",
+            trait_name == "CSCORE" ~ "Conscientiousness",
+            trait_name == "IMPULSIVITY" ~ "Impulsivity",
+            trait_name == "SS" ~ "Sensation seeking",
+            TRUE ~ trait_name
+        ),
+        score_num = as.numeric(factor(trait_score))
+    ) |>
+    group_by(trait_name) |>
+    mutate(
+        trait_group = ifelse(
+            score_num >= median(score_num, na.rm = TRUE),
+            "Higher",
+            "Lower"
+        )
+    ) |>
+    ungroup()
+
+# Create selected drug data in long format
+drug_long_selected <- drug_data |>
+    mutate(
+        row_id = row_number()
+    ) |>
+    select(
+        row_id,
+        all_of(selected_drug_cols)
+    ) |>
+    pivot_longer(
+        cols = all_of(selected_drug_cols),
+        names_to = "drug_name",
+        values_to = "drug_use"
+    ) |>
+    mutate(
+        drug_name = case_when(
+            drug_name == "CANNABIS" ~ "Cannabis",
+            drug_name == "COKE" ~ "Cocaine",
+            drug_name == "ECSTASY" ~ "Ecstasy",
+            drug_name == "MUSHROOMS" ~ "Mushrooms",
+            drug_name == "ALCOHOL" ~ "Alcohol",
+            drug_name == "CAFF" ~ "Caffeine",
+            TRUE ~ drug_name
+        ),
+        user_numeric = ifelse(drug_use == "CL0", 0, 1)
+    )
+
+# Compare drug use between higher and lower scoring groups for each trait
+trait_drug_summary <- trait_long |>
+    inner_join(drug_long_selected, by = "row_id") |>
+    group_by(trait_name, drug_name, trait_group) |>
+    summarise(
+        percent_user = mean(user_numeric),
+        .groups = "drop"
+    ) |>
+    pivot_wider(
+        names_from = trait_group,
+        values_from = percent_user
+    ) |>
+    mutate(
+        percent_gap = Higher - Lower
+    )
+
+# Plot
+trait_drug_heatmap <- ggplot(
+    trait_drug_summary,
+    aes(
+        x = trait_name,
+        y = drug_name,
+        fill = percent_gap
+    )
+) +
+    geom_tile(color = "white") +
+    scale_fill_gradient2(
+        low = "#F07A70",
+        mid = "#FAF3E0",
+        high = "#20B8C4",
+        labels = scales::percent
+    ) +
+    labs(
+        title = "Different Drugs Have Different Personality Profiles",
+        subtitle = "Gap in reported use between higher and lower-scoring respondents",
+        x = "Personality Trait",
+        y = "Drug",
+        fill = "High - Low gap"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.text = element_text(face = "bold"),
+        legend.position = "right"
+    )
+```
+
+This heatmap expands the comparison across multiple personality traits and substances. Each cell shows the difference in the reported use between respondents with higher scores vs. lower scores for that trait. Positive values mean use is more common among higher-scoring respondents, while negative values mean that use is more common among lower-scoring ones. This makes it easier to see which combinations of traits and drugs stand out. @cr-trait-drug
+
+::: {#cr-trait-drug}
+```{r}
+trait_drug_heatmap
+```
+:::
 
 :::{.narrative}
 ## Section 7: Conclusion
