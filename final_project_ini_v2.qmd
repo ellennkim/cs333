@@ -25,7 +25,7 @@ body {
 
 
 ```{r}
-# load libraries 
+# load libraries
 library(tidyverse)
 library(ggplot2)
 library(scales)
@@ -48,46 +48,46 @@ summary(drug_data)
 
 # Create any drug use var to represent users of any drug in the dataset
 drug_data <- drug_data |>
-  mutate(
-    any_drug_use = ifelse(
-      CANNABIS != "CL0" | COKE != "CL0" | ECSTASY != "CL0",
-      "User", "Non-user"
+    mutate(
+        any_drug_use = ifelse(
+            CANNABIS != "CL0" | COKE != "CL0" | ECSTASY != "CL0",
+            "User", "Non-user"
+        )
     )
-  )
 
-  # create a small overview table describing the dataset
-  overview_tbl <- tibble(
+# create a small overview table describing the dataset
+overview_tbl <- tibble(
     Category = c(
-      "Number of respondents",
-      "Number of variables",
-      "Drug use definition",
-      "Drug variables used for current prototype",
-      "Demographic variables",
-      "Personality variables",
-      "Survey population"
-  ),
+        "Number of respondents",
+        "Number of variables",
+        "Drug use definition",
+        "Drug variables used for current prototype",
+        "Demographic variables",
+        "Personality variables",
+        "Survey population"
+    ),
     Description = c(
-      nrow(drug_data),
-      ncol(drug_data),
-      "User = respondent reported use of cannabis, coke, or ecstasy",
-      "Cannabis, coke, ecstasy",
-      "Age, gender, education, country, ethnicity",
-      "Neuroticism, extraversion, openness, agreeableness, conscientiousness, impulsivity, sensation seeking",
-      "Adults from English-speaking countries"
+        nrow(drug_data),
+        ncol(drug_data),
+        "User = respondent reported use of cannabis, coke, or ecstasy",
+        "Cannabis, coke, ecstasy",
+        "Age, gender, education, country, ethnicity",
+        "Neuroticism, extraversion, openness, agreeableness, conscientiousness, impulsivity, sensation seeking",
+        "Adults from English-speaking countries"
     )
 )
 
 # create formatted table using gt package
 overview_tbl |>
-  gt() |>
-  tab_header(
-    title = "Dataset Overview",
-    subtitle = "Drug Consumption Survey Dataset"
-  ) |>
-  cols_width(
-    Category ~ px(280),
-    Description ~ px(520)
-  )
+    gt() |>
+    tab_header(
+        title = "Dataset Overview",
+        subtitle = "Drug Consumption Survey Dataset"
+    ) |>
+    cols_width(
+        Category ~ px(280),
+        Description ~ px(520)
+    )
 ```
 
 This dataset contains individual survey responses about demographics, personality traits, and drug consumption. For this prototype, we define a respondent as a “User” if they reported any use of cannabis, coke, or ecstasy. This gives us a simplified outcome variable that lets us compare drug use patterns across demographic and psychological factors. 
@@ -96,209 +96,229 @@ This dataset contains individual survey responses about demographics, personalit
 Communication Goal -> Establish the basic question: who reports drug use at all? -->
 
 ```{r}
-  # calculate counts and percentages of users vs non-users
+# calculate counts and percentages of users vs non-users
 overall_usage <- drug_data |>
-  # count number of respondents in each category
-  count(any_drug_use) |>
-  # create percentage column
-  mutate(
-    percent = n / sum(n)
-  )
+    # count number of respondents in each category
+    count(any_drug_use) |>
+    # create percentage column
+    mutate(
+        percent = n / sum(n)
+    )
 
 # create bar chart
 overall_plot <- overall_usage |>
-  ggplot(
-    aes(
-      x = any_drug_use,
-      y = percent,
-      fill = any_drug_use
-    )) +
-  geom_col(width = 0.6) +
-  # add percentage labels on top of bars
-  geom_text(
-    aes(label = percent(percent, accuracy = 0.1)),
-    vjust = -0.5,
-    size = 5) +
-  scale_y_continuous(
-    labels = percent,
-    limits = c(0, 1)) +
-  scale_fill_manual(
-    values = c(
-      "User" = "#20B8C4",
-      "Non-user" = "#F07A70"
-    )) +
-  labs(
-    title = "Overall Reported Drug Use",
-    subtitle = "Users are respondents who reported cannabis, coke, or ecstasy use",
-    x = "",
-    y = "Percent of respondents",
-    fill = "Drug usage") +
-  theme_minimal(base_size = 14) +
-  theme(
-    legend.position = "none",
-    plot.title = element_text(face = "bold"),
-    axis.text.x = element_text(face = "bold")
-  )
-
+    ggplot(
+        aes(
+            x = any_drug_use,
+            y = percent,
+            fill = any_drug_use
+        )
+    ) +
+    geom_col(width = 0.6) +
+    # add percentage labels on top of bars
+    geom_text(
+        aes(label = percent(percent, accuracy = 0.1)),
+        vjust = -0.5,
+        size = 5
+    ) +
+    scale_y_continuous(
+        labels = percent,
+        limits = c(0, 1)
+    ) +
+    scale_fill_manual(
+        values = c(
+            "User" = "#20B8C4",
+            "Non-user" = "#F07A70"
+        )
+    ) +
+    labs(
+        title = "Overall Reported Drug Use",
+        subtitle = "Users are respondents who reported cannabis, coke, or ecstasy use",
+        x = "",
+        y = "Percent of respondents",
+        fill = "Drug usage"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        legend.position = "none",
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(face = "bold")
+    )
 ```
 
 
 ```{r}
 # Create summary table for age and drug use
 age_summary <- drug_data |>
-  mutate(
-    age_group = case_when(
-      AGE == "Ag1" ~ "18-24",
-      AGE == "Ag2" ~ "25-34",
-      AGE == "Ag3" ~ "35-44",
-      AGE == "Ag4" ~ "45-54",
-      AGE == "Ag5" ~ "55-64",
-      AGE == "Ag6" ~ "65+",
-      TRUE ~ NA_character_
-    ),
-    # keep age groups in the correct order
-    age_group = factor(
-      age_group,
-      levels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")
-    )
-  ) |>
-  # count users and non-users within each age group
-  count(age_group, any_drug_use) |>
-  # calculate percentage within each age group
-  group_by(age_group) |>
-  mutate(
-    percent = n / sum(n)
-  ) |>
-  ungroup()
+    mutate(
+        age_group = case_when(
+            AGE == "Ag1" ~ "18-24",
+            AGE == "Ag2" ~ "25-34",
+            AGE == "Ag3" ~ "35-44",
+            AGE == "Ag4" ~ "45-54",
+            AGE == "Ag5" ~ "55-64",
+            AGE == "Ag6" ~ "65+",
+            TRUE ~ NA_character_
+        ),
+        # keep age groups in the correct order
+        age_group = factor(
+            age_group,
+            levels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+        )
+    ) |>
+    # count users and non-users within each age group
+    count(age_group, any_drug_use) |>
+    # calculate percentage within each age group
+    group_by(age_group) |>
+    mutate(
+        percent = n / sum(n)
+    ) |>
+    ungroup()
 
-# Create plot 
+# Create plot
 age_plot <- ggplot(
-  age_summary,
-  aes(
-    x = age_group,
-    y = percent,
-    fill = any_drug_use
-  )) +
-  geom_col(width = 0.75) +
-  scale_y_continuous(
-    labels = scales::percent,
-    limits = c(0, 1)) +
-  scale_fill_manual(
-    values = c(
-      "User" = "#20B8C4",
-      "Non-user" = "#F07A70"
-    )) +
-  labs(
-    title = "Drug Use Is Highest Among Younger Respondents",
-    subtitle = "Share of users and non-users within each age group",
-    x = "Age range",
-    y = "Percent of respondents",
-    fill = "Drug use") +
-  theme_minimal(base_size = 14) +
-  theme(
-    plot.title = element_text(face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "right"
-  )
-
+    age_summary,
+    aes(
+        x = age_group,
+        y = percent,
+        fill = any_drug_use
+    )
+) +
+    geom_col(width = 0.75) +
+    scale_y_continuous(
+        labels = scales::percent,
+        limits = c(0, 1)
+    ) +
+    scale_fill_manual(
+        values = c(
+            "User" = "#20B8C4",
+            "Non-user" = "#F07A70"
+        )
+    ) +
+    labs(
+        title = "Drug Use Is Highest Among Younger Respondents",
+        subtitle = "Share of users and non-users within each age group",
+        x = "Age range",
+        y = "Percent of respondents",
+        fill = "Drug use"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "right"
+    )
 ```
 
 
 ```{r}
 # Create summary table for gender and drug use
 gender_summary <- drug_data |>
-  mutate(
-    gender = case_when(
-      GENDER == "M" ~ "Male",
-      GENDER == "F" ~ "Female",
-      TRUE ~ as.character(GENDER)
-    )
-  ) |>
-  count(gender, any_drug_use) |>
-  group_by(gender) |>
-  mutate(
-    percent = n / sum(n)
-  ) |>
-  ungroup()
-  
+    mutate(
+        gender = case_when(
+            GENDER == "M" ~ "Male",
+            GENDER == "F" ~ "Female",
+            TRUE ~ as.character(GENDER)
+        )
+    ) |>
+    count(gender, any_drug_use) |>
+    group_by(gender) |>
+    mutate(
+        percent = n / sum(n)
+    ) |>
+    ungroup()
+
 # plot
 gender_plot <- ggplot(
-  gender_summary,
-  aes(
-    x = gender,
-    y = percent,
-    fill = any_drug_use)) +
-  geom_col(width = 0.65) +
-  scale_y_continuous(
-    labels = scales::percent,
-    limits = c(0, 1)) +
-  scale_fill_manual(
-    values = c(
-      "User" = "#20B8C4",
-      "Non-user" = "#F07A70")) +
-  labs(
-    title = "Reported Drug Use Differs by Gender",
-    subtitle = "Share of users and non-users within each gender group",
-    x = "Gender",
-    y = "Percent of respondents",
-    fill = "Drug use") +
-  theme_minimal(base_size = 14) +
-  theme(
-    plot.title = element_text(face = "bold"),
-    legend.position = "right")
-
+    gender_summary,
+    aes(
+        x = gender,
+        y = percent,
+        fill = any_drug_use
+    )
+) +
+    geom_col(width = 0.65) +
+    scale_y_continuous(
+        labels = scales::percent,
+        limits = c(0, 1)
+    ) +
+    scale_fill_manual(
+        values = c(
+            "User" = "#20B8C4",
+            "Non-user" = "#F07A70"
+        )
+    ) +
+    labs(
+        title = "Reported Drug Use Differs by Gender",
+        subtitle = "Share of users and non-users within each gender group",
+        x = "Gender",
+        y = "Percent of respondents",
+        fill = "Drug use"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold"),
+        legend.position = "right"
+    )
 ```
 
 
 ```{r}
 # Create summary table for age, gender, and drug use
 age_gender_summary <- drug_data |>
-  mutate(
-    age_group = case_when(
-      AGE == "Ag1" ~ "18-24",
-      AGE == "Ag2" ~ "25-34",
-      AGE == "Ag3" ~ "35-44",
-      AGE == "Ag4" ~ "45-54",
-      AGE == "Ag5" ~ "55-64",
-      AGE == "Ag6" ~ "65+"),
-    age_group = factor(
-      age_group,
-      levels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")),
-    gender = case_when(
-      GENDER == "M" ~ "Male",
-      GENDER == "F" ~ "Female")
-  ) |>
-  count(gender, age_group, any_drug_use) |>
-  group_by(gender, age_group) |>
-  mutate(
-    percent = n / sum(n)
-  ) |>
-  ungroup()
+    mutate(
+        age_group = case_when(
+            AGE == "Ag1" ~ "18-24",
+            AGE == "Ag2" ~ "25-34",
+            AGE == "Ag3" ~ "35-44",
+            AGE == "Ag4" ~ "45-54",
+            AGE == "Ag5" ~ "55-64",
+            AGE == "Ag6" ~ "65+"
+        ),
+        age_group = factor(
+            age_group,
+            levels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+        ),
+        gender = case_when(
+            GENDER == "M" ~ "Male",
+            GENDER == "F" ~ "Female"
+        )
+    ) |>
+    count(gender, age_group, any_drug_use) |>
+    group_by(gender, age_group) |>
+    mutate(
+        percent = n / sum(n)
+    ) |>
+    ungroup()
 
 # Create age-by-gender plot
 agebygender_plot <- ggplot(
-  age_gender_summary,
-  aes(x = age_group, y = percent, fill = any_drug_use)) +
-  geom_col(width = 0.75) +
-  facet_wrap(~ gender) +
-  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
-  scale_fill_manual(
-    values = c(
-      "User" = "#20B8C4",
-      "Non-user" = "#F07A70")) +
-  labs(
-    title = "Age Patterns Differ Across Gender",
-    subtitle = "Share of users and non-users within each age and gender group",
-    x = "Age range",
-    y = "Percent of respondents",
-    fill = "Drug use") +
-  theme_minimal(base_size = 14) +
-  theme(
-    plot.title = element_text(face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    strip.text = element_text(face = "bold"),
-    legend.position = "right")
-
+    age_gender_summary,
+    aes(x = age_group, y = percent, fill = any_drug_use)
+) +
+    geom_col(width = 0.75) +
+    facet_wrap(~gender) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    scale_fill_manual(
+        values = c(
+            "User" = "#20B8C4",
+            "Non-user" = "#F07A70"
+        )
+    ) +
+    labs(
+        title = "Age Patterns Differ Across Gender",
+        subtitle = "Share of users and non-users within each age and gender group",
+        x = "Age range",
+        y = "Percent of respondents",
+        fill = "Drug use"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.text = element_text(face = "bold"),
+        legend.position = "right"
+    )
 ```
 
 
@@ -447,6 +467,193 @@ drug_freq_plot
 ## Section 5: Personality Traits & Drug Use
 :::
 ---- ADD graphs + analysis here (follow earlier structure) ---
+```{r}
+ss_summary <- drug_data |>
+    mutate(
+        sensation_score = factor(SS)
+    ) |>
+    count(sensation_score, any_drug_use) |>
+    group_by(sensation_score) |>
+    mutate(
+        percent = n / sum(n)
+    ) |>
+    ungroup()
+
+# Plot
+sensation_plot <- ggplot(
+    ss_summary,
+    aes(
+        x = sensation_score,
+        y = percent,
+        fill = any_drug_use
+    )
+) +
+    geom_col(width = 0.75) +
+    scale_y_continuous(
+        labels = scales::percent,
+        limits = c(0, 1)
+    ) +
+    scale_fill_manual(
+        values = c(
+            "User" = "#20B8C4",
+            "Non-user" = "#F07A70"
+        )
+    ) +
+    labs(
+        title = "Higher Sensation Seeking Is Associated With Higher Drug Use",
+        x = "Sensation-seeking score",
+        y = "Percent",
+        fill = "Drug use"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "right"
+    )
+```
+
+This graph shows one of the clearest relationships in the project. As sensation-seeking scores increase, the proportion of respondents reporting drug use rises substantially. Lower sensation-seeking groups contain larger shares of non-users, while higher-scoring groups are dominated by users. Compared with the earlier demographic graphs, the pattern here appears stronger and more consistent, suggesting that personality traits may explain drug use behavior more effectively than age or gender alone. @cr-sensation
+
+::: {#cr-sensation}
+```{r}
+sensation_plot
+```
+:::
+
+```{r}
+# Create impulsivity summary
+impulsivity_summary <- drug_data |>
+    mutate(
+        impulsivity_score = factor(IMPULSIVITY)
+    ) |>
+    count(impulsivity_score, any_drug_use) |>
+    group_by(impulsivity_score) |>
+    mutate(
+        percent = n / sum(n)
+    ) |>
+    ungroup()
+
+# Plot
+impulsivity_plot <- ggplot(
+    impulsivity_summary,
+    aes(
+        x = impulsivity_score,
+        y = percent,
+        fill = any_drug_use
+    )
+) +
+    geom_col(width = 0.75) +
+    scale_y_continuous(
+        labels = scales::percent,
+        limits = c(0, 1)
+    ) +
+    scale_fill_manual(
+        values = c(
+            "User" = "#20B8C4",
+            "Non-user" = "#F07A70"
+        )
+    ) +
+    labs(
+        title = "Drug Use Also Rises Across Impulsivity Scores",
+        x = "Impulsivity score",
+        y = "Percent",
+        fill = "Drug use"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "right"
+    )
+```
+
+Impulsivity shows a similar pattern to sensation seeking, though the relationship appears somewhat weaker. Respondents with higher impulsivity scores generally report higher levels of drug use, while lower-scoring groups contain larger shares of non-users. Together, these two graphs suggest that behavioral and psychological tendencies may be closely connected to reported drug consumption patterns. @cr-impulsive
+
+::: {#cr-impulsive}
+```{r}
+impulsivity_plot
+```
+:::
+
+```{r}
+personality_long <- drug_data |>
+    mutate(
+        user_numeric = ifelse(any_drug_use == "User", 1, 0)
+    ) |>
+    select(
+        user_numeric,
+        NSCORE,
+        ESCORE,
+        OSCORE,
+        ASCORE,
+        CSCORE
+    ) |>
+    pivot_longer(
+        cols = -user_numeric,
+        names_to = "trait_name",
+        values_to = "trait_score"
+    ) |>
+    # convert ordered categories to numeric scale
+    mutate(
+        trait_score_num = as.numeric(factor(trait_score))
+    ) |>
+    group_by(trait_name, trait_score_num) |>
+    summarise(
+        percent_user = mean(user_numeric),
+        .groups = "drop"
+    )
+
+# ---- plot ----
+personality_plot <- ggplot(
+    personality_long,
+    aes(
+        x = trait_score_num,
+        y = percent_user,
+        color = trait_name,
+        group = trait_name
+    )
+) +
+    geom_smooth(se = FALSE, linewidth = 1.3, method = "loess") +
+    scale_y_continuous(labels = percent, limits = c(0, 1)) +
+    scale_x_continuous(breaks = pretty_breaks(n = 5)) +
+    scale_color_manual(
+        values = c(
+            NSCORE = "#F07A70",
+            ESCORE = "#20B8C4",
+            OSCORE = "#7A5CF0",
+            ASCORE = "#3FA34D",
+            CSCORE = "#F2B134"
+        ),
+        labels = c(
+            NSCORE = "Neuroticism",
+            ESCORE = "Extraversion",
+            OSCORE = "Openness",
+            ASCORE = "Agreeableness",
+            CSCORE = "Conscientiousness"
+        )
+    ) +
+    labs(
+        title = "Personality Traits Show Different Relationships With Drug Use",
+        x = "Trait score",
+        y = "Percent reporting drug use",
+        color = "Trait"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        legend.position = "right",
+        plot.title = element_text(face = "bold")
+    )
+```
+
+
+The five NEO personality traits show that psychological dimensions do not all relate to drug use in the same way. Some traits display clearer directional patterns, while others remain relatively flat or inconsistent across score ranges. Openness, extraversion, and neuroticism appear more positively associated with reported drug use, while conscientiousness tends to show the opposite pattern. The variation across traits reinforces the idea that personality may provide deeper insight into drug-use behavior than demographic categories alone. @cr-personality
+
+::: {#cr-personality}
+```{r}
+personality_plot
+```
+:::
 
 :::{.narrative}
 ## Section 6: Personality Traits by Specific Drugs
