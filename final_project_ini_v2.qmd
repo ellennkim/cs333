@@ -616,7 +616,187 @@ agebygender_plot
 ## Section 3: Education and Drug Use
 ## Does social/demographic structure beyond age and gender relate to drug use?
 :::
----- ADD graphs + analysis here (follow earlier structure) ---
+
+```{r}
+# Create readable education labels
+drug_data <- drug_data |>
+  mutate(
+    education_label = case_when(
+      EDUCATION == "Ed1" ~ "Left school before 16",
+      EDUCATION == "Ed2" ~ "Left school at 16",
+      EDUCATION == "Ed3" ~ "Left school at 17",
+      EDUCATION == "Ed4" ~ "Left school at 18",
+      EDUCATION == "Ed5" ~ "Some college or university",
+      EDUCATION == "Ed6" ~ "Professional certificate",
+      EDUCATION == "Ed7" ~ "University degree",
+      EDUCATION == "Ed8" ~ "Masters degree",
+      EDUCATION == "Ed9" ~ "Doctorate degree",
+      TRUE ~ NA_character_
+    ),
+    education_label = factor(
+      education_label,
+      levels = c(
+        "Left school before 16",
+        "Left school at 16",
+        "Left school at 17",
+        "Left school at 18",
+        "Some college or university",
+        "Professional certificate",
+        "University degree",
+        "Masters degree",
+        "Doctorate degree"
+      )
+    )
+  )
+
+# Summary for education and drug use
+education_summary <- drug_data |>
+  count(education_label, any_drug_use) |>
+  group_by(education_label) |>
+  mutate(
+    percent = n / sum(n)
+  ) |>
+  ungroup()
+
+# Plot
+education_plot <- ggplot(
+  education_summary,
+  aes(
+    x = education_label,
+    y = percent,
+    fill = any_drug_use
+  )
+) +
+  geom_col(position = "fill") +
+  coord_flip() +
+  scale_y_continuous(labels = percent) +
+  scale_fill_manual(
+    values = c(
+      "User" = "#20B8C4",
+      "Non-user" = "#F07A70"
+    )
+  ) +
+  labs(
+    title = "Drug Use Varies Across Education Levels",
+    x = "Education level",
+    y = "Percent",
+    fill = "Drug usage"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold")
+  )
+```
+
+Education gives a more complex view of drug use because it may reflect age, opportunity, social environment, or life stage. Rather than showing a simple linear pattern, this graph helps us ask whether certain education groups report higher or lower drug use. @cr-education
+
+::: {#cr-education}
+```{r}
+education_plot
+```
+:::
+
+```{r}
+# Education by age distribution
+education_age_distribution <- drug_data |>
+  mutate(
+    age_group = case_when(
+      AGE == "Ag1" ~ "18-24",
+      AGE == "Ag2" ~ "25-34",
+      AGE == "Ag3" ~ "35-44",
+      AGE == "Ag4" ~ "45-54",
+      AGE == "Ag5" ~ "55-64",
+      AGE == "Ag6" ~ "65+"
+    )
+  )
+
+education_age_plot <- ggplot(
+  education_age_distribution,
+  aes(
+    x = education_label,
+    fill = age_group
+  )
+) +
+  geom_bar(position = "fill") +
+  coord_flip() +
+  scale_y_continuous(labels = percent) +
+  labs(
+    title = "Education Patterns May Also Reflect Age Differences",
+    x = "Education level",
+    y = "Percent",
+    fill = "Age group"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold")
+  )
+```
+
+Because education level is closely tied to age, we include this graph to avoid over-interpreting education alone. If some education categories contain more young respondents, then higher drug use in those groups may partly reflect age rather than education itself. @cr-education-age
+
+::: {#cr-education-age}
+```{r}
+education_age_plot
+```
+:::
+
+```{r}
+# Education + age + drug use summary
+education_age_summary <- drug_data |>
+  mutate(
+    age_group = case_when(
+      AGE == "Ag1" ~ "18-24",
+      AGE == "Ag2" ~ "25-34",
+      AGE == "Ag3" ~ "35-44",
+      AGE == "Ag4" ~ "45-54",
+      AGE == "Ag5" ~ "55-64",
+      AGE == "Ag6" ~ "65+"
+    )
+  ) |>
+  count(age_group, education_label, any_drug_use) |>
+  group_by(age_group, education_label) |>
+  mutate(
+    percent = n / sum(n)
+  ) |>
+  ungroup()
+
+education_age_drug_plot <- ggplot(
+  education_age_summary,
+  aes(
+    x = education_label,
+    y = percent,
+    fill = any_drug_use
+  )
+) +
+  geom_col(position = "fill") +
+  facet_wrap(~ age_group) +
+  coord_flip() +
+  scale_y_continuous(labels = percent) +
+  scale_fill_manual(
+    values = c(
+      "User" = "#20B8C4",
+      "Non-user" = "#F07A70"
+    )
+  ) +
+  labs(
+    title = "Education and Drug Use Within Age Groups",
+    x = "Education level",
+    y = "Percent",
+    fill = "Drug usage"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold")
+  )
+```
+
+This graph makes the education section more careful and convincing. By comparing education levels within age groups, we can see whether education still appears related to drug use after accounting for age differences. @cr-education-age-drug
+
+::: {#cr-education-age-drug}
+```{r}
+education_age_drug_plot
+```
+:::
 
 :::{.narrative}
 ## Section 4: Which Drugs are Most Common?
