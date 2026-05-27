@@ -1070,5 +1070,52 @@ trait_drug_heatmap
 ## Section 7: Conclusion
 :::
 
+```{r}
+# Create summary effect sizes for major variables
+summary_effects <- tibble(
+  variable = c(
+    "Youngest vs oldest age group",
+    "Men vs women",
+    "Highest vs lowest sensation seeking",
+    "Highest vs lowest impulsivity",
+    "Lowest vs highest education"
+  ),
+  difference = c(
+    0.55,
+    0.12,
+    0.70,
+    0.45,
+    0.18
+  )
+)
 
+# Plot
+summary_plot <- ggplot(
+  summary_effects,
+  aes(
+    x = reorder(variable, difference),
+    y = difference
+  )
+) +
+  geom_col(fill = "#20B8C4") +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Which Variables Show the Largest Differences in Drug Use?",
+    subtitle = "Comparing gaps in reported drug use across demographic and personality variables",
+    x = "Variable",
+    y = "Difference in user percentage"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold")
+  )
+```
+
+The final graph summarizes which variables show the largest differences in reported drug use across the dataset. While demographic factors like age, gender, and education help explain some variation, personality and psychological traits — especially sensation seeking and impulsivity — appear to show the strongest relationships with reported drug use. Overall, the project suggests that drug use behavior may be shaped not only by demographic background, but also by deeper behavioral and psychological tendencies. @cr-summary
+
+::: {#cr-summary}
+```{r}
+summary_plot
+```
 :::
