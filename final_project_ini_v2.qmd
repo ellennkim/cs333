@@ -8,6 +8,7 @@ execute:
 ---
 
 
+
 <style>
 body {
   background-color: #FAF3E0 ;
@@ -18,7 +19,7 @@ body {
 </style>
 
 
-# Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness. 
+# Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness.. 
 
 # Section 1: Introduction/Dataset Context 
 
