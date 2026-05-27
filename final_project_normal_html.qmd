@@ -3,26 +3,17 @@ title: Drug Usage Exploration
 format: html
 fontsize: 1em
 execute:
-  echo: false
-  warning: false
-  message: false
+    echo: false
+    warning: false
+    message: false
+    fig-width: 10
+    fig-height: 6
 ---
 
 
+**Drug use is not evenly distributed across the population.** It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness.
 
-<style>
-body {
-  background-color: #FAF3E0 ;
-}
-.cr-section {
-  background-color: #FFE5B4 ;
-}
-</style>
-
-
-# Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness.
-
-# Section 1: Introduction/Dataset Context 
+## Section 1: Introduction/Dataset Context 
 
 
 ```{r}
@@ -571,52 +562,38 @@ personality_plot <- ggplot(
 <!-- end of section 5 -->
 
 
-::: {.cr-section}
-
-:::{.narrative}
 ## Section 2: Baseline Drug Use Patterns
 ## Lets establish the basic question: who reports drug use at all?
-:::
 
 
-This graph establishes the baseline distribution of drug usage within the dataset using our simplified classification system. Respondents were categorized as “Users” if they reported any cannabis, coke, or ecstasy use, while all others were labeled “Non-users.” Almost 80% of respondents fall into the “User” category, suggesting that some level of reported drug use is relatively common within this survey population. This baseline helps contextualize the demographic and personality-based patterns explored in later sections of the project. @cr-overall
+This graph establishes the baseline distribution of drug usage within the dataset using our simplified classification system. Respondents were categorized as “Users” if they reported any cannabis, coke, or ecstasy use, while all others were labeled “Non-users.” Almost 80% of respondents fall into the “User” category, suggesting that some level of reported drug use is relatively common within this survey population. This baseline helps contextualize the demographic and personality-based patterns explored in later sections of the project.
 
-:::{#cr-overall}
 ```{r}
 overall_plot
 ```
-:::
 
-This graph shows a strong relationship between age and reported drug use within the survey population. Respondents in the youngest age group, 18–24, had the highest share of reported drug use, with usage steadily decreasing across older age groups. By the 65+ category, non-users make up the majority of respondents. This pattern suggests that younger individuals in the dataset are substantially more likely to report drug use than older respondents, making age one of the clearest demographic trends in the project. @cr-age
+This graph shows a strong relationship between age and reported drug use within the survey population. Respondents in the youngest age group, 18–24, had the highest share of reported drug use, with usage steadily decreasing across older age groups. By the 65+ category, non-users make up the majority of respondents. This pattern suggests that younger individuals in the dataset are substantially more likely to report drug use than older respondents, making age one of the clearest demographic trends in the project.
 
 
-::: {#cr-age}
 ```{r}
 age_plot
 ```
-:::
 
-This graph shows noticeable differences in reported drug use across gender groups within the dataset. Male respondents report higher levels of drug use overall, with almost 90% categorized as “Users,” compared to a lower share among female respondents. While both groups contain a majority of users, the gap suggests that gender may play a role in reported drug consumption patterns. Together with the age analysis, this graph helps establish demographic trends before exploring more detailed personality-based relationships later in the project. @cr-gender
+This graph shows noticeable differences in reported drug use across gender groups within the dataset. Male respondents report higher levels of drug use overall, with almost 90% categorized as “Users,” compared to a lower share among female respondents. While both groups contain a majority of users, the gap suggests that gender may play a role in reported drug consumption patterns. Together with the age analysis, this graph helps establish demographic trends before exploring more detailed personality-based relationships later in the project.
 
-::: {#cr-gender}
 ```{r}
 gender_plot
 ```
-:::
 
-This graph combines the project’s two strongest demographic patterns: age and gender. Across both male and female respondents, reported drug use is highest among younger age groups and generally declines with age. However, the decline is more pronounced among female respondents, where the proportion of non-users increases substantially in older age categories. Male respondents consistently report higher levels of drug use across nearly every age group. By comparing both demographics simultaneously, this visualization shows that age-related patterns remain visible across genders while also highlighting an overall gender gap in reported drug use. @cr-agegender
+This graph combines the project’s two strongest demographic patterns: age and gender. Across both male and female respondents, reported drug use is highest among younger age groups and generally declines with age. However, the decline is more pronounced among female respondents, where the proportion of non-users increases substantially in older age categories. Male respondents consistently report higher levels of drug use across nearly every age group. By comparing both demographics simultaneously, this visualization shows that age-related patterns remain visible across genders while also highlighting an overall gender gap in reported drug use.
 
 
-::: {#cr-agegender}
 ```{r}
 agebygender_plot
 ```
-:::
 
-:::{.narrative}
 ## Section 3: Education and Drug Use
 ## Does social/demographic structure beyond age and gender relate to drug use?
-:::
 
 ```{r}
 # Create readable education labels
@@ -689,13 +666,11 @@ education_plot <- ggplot(
   )
 ```
 
-Education gives a more complex view of drug use because it may reflect age, opportunity, social environment, or life stage. Rather than showing a simple linear pattern, this graph helps us ask whether certain education groups report higher or lower drug use. @cr-education
+Education gives a more complex view of drug use because it may reflect age, opportunity, social environment, or life stage. Rather than showing a simple linear pattern, this graph helps us ask whether certain education groups report higher or lower drug use.
 
-::: {#cr-education}
 ```{r}
 education_plot
 ```
-:::
 
 ```{r}
 # Education by age distribution
@@ -733,13 +708,11 @@ education_age_plot <- ggplot(
   )
 ```
 
-Because education level is closely tied to age, we include this graph to avoid over-interpreting education alone. If some education categories contain more young respondents, then higher drug use in those groups may partly reflect age rather than education itself. @cr-education-age
+Because education level is closely tied to age, we include this graph to avoid over-interpreting education alone. If some education categories contain more young respondents, then higher drug use in those groups may partly reflect age rather than education itself.
 
-::: {#cr-education-age}
 ```{r}
 education_age_plot
 ```
-:::
 
 ```{r}
 # Education + age + drug use summary
@@ -791,70 +764,52 @@ education_age_drug_plot <- ggplot(
   )
 ```
 
-This graph makes the education section more careful and convincing. By comparing education levels within age groups, we can see whether education still appears related to drug use after accounting for age differences. @cr-education-age-drug
+This graph makes the education section more careful and convincing. By comparing education levels within age groups, we can see whether education still appears related to drug use after accounting for age differences.
 
-::: {#cr-education-age-drug}
 ```{r}
 education_age_drug_plot
 ```
-:::
 
-:::{.narrative}
 ## Section 4: Which Drugs are Most Common?
 ## Let's examine which drugs are most commonly reported.
-:::
 
 
-Drug use is a broad term. This graph establishes that the most commonly used drugs across respondents is caffeine, chocolate, and alchol, with almost an 100% rate. As such, this data demonstrates that most people who answer the survey will be categorized as a drug user. Over 75% of users reported consuming cannabis and nicotine and many of the illegal drugs reported a lower percentage of users. These patterns suggest that the most commonly used substances are typically legal and easy to obtain. It also demonstrates a social aspect to drug usage as the majority of the most commonly used drugs are socially acceptable to consume. @cr-drugtotal
+Drug use is a broad term. This graph establishes that the most commonly used drugs across respondents is caffeine, chocolate, and alchol, with almost an 100% rate. As such, this data demonstrates that most people who answer the survey will be categorized as a drug user. Over 75% of users reported consuming cannabis and nicotine and many of the illegal drugs reported a lower percentage of users. These patterns suggest that the most commonly used substances are typically legal and easy to obtain. It also demonstrates a social aspect to drug usage as the majority of the most commonly used drugs are socially acceptable to consume.
 
-::: {#cr-drugtotal}
 ```{r}
 drug_total_plot
 ```
-:::
 
-This graph shows that most drugs are not used frequently. However, if respondents are using certain drugs with a frequency, those drugs tend to be alcohol, caffeine, cannabis, chocolate, and nicotine. As shown with the drug use graph, this data helps to reinforce that socially acceptable, legal drugs are utilized more. This graph also helps to show a difference between reporting use of a drug and actually consuming it regularly. While an individual may report consuming a drug, it may be experimental (once or twice) rather than frequent. Some drugs may also have less people using them, but they are using them with more frequency - like mushrooms or ecstasy. @cr-drugfrequency
+This graph shows that most drugs are not used frequently. However, if respondents are using certain drugs with a frequency, those drugs tend to be alcohol, caffeine, cannabis, chocolate, and nicotine. As shown with the drug use graph, this data helps to reinforce that socially acceptable, legal drugs are utilized more. This graph also helps to show a difference between reporting use of a drug and actually consuming it regularly. While an individual may report consuming a drug, it may be experimental (once or twice) rather than frequent. Some drugs may also have less people using them, but they are using them with more frequency - like mushrooms or ecstasy.
 
-::: {#cr-drugfrequency}
 ```{r}
 drug_freq_plot
 ```
-:::
 
-:::{.narrative}
 ## Section 5: Personality Traits & Drug Use
-:::
 
 
-This graph shows one of the clearest relationships in the project. As sensation-seeking scores increase, the proportion of respondents reporting drug use rises substantially. Lower sensation-seeking groups contain larger shares of non-users, while higher-scoring groups are dominated by users. Compared with the earlier demographic graphs, the pattern here appears stronger and more consistent, suggesting that personality traits may explain drug use behavior more effectively than age or gender alone. @cr-sensation
+This graph shows one of the clearest relationships in the project. As sensation-seeking scores increase, the proportion of respondents reporting drug use rises substantially. Lower sensation-seeking groups contain larger shares of non-users, while higher-scoring groups are dominated by users. Compared with the earlier demographic graphs, the pattern here appears stronger and more consistent, suggesting that personality traits may explain drug use behavior more effectively than age or gender alone.
 
-::: {#cr-sensation}
 ```{r}
 sensation_plot
 ```
-:::
 
 
-Impulsivity shows a similar pattern to sensation seeking, though the relationship appears somewhat weaker. Respondents with higher impulsivity scores generally report higher levels of drug use, while lower-scoring groups contain larger shares of non-users. Together, these two graphs suggest that behavioral and psychological tendencies may be closely connected to reported drug consumption patterns. @cr-impulsive
+Impulsivity shows a similar pattern to sensation seeking, though the relationship appears somewhat weaker. Respondents with higher impulsivity scores generally report higher levels of drug use, while lower-scoring groups contain larger shares of non-users. Together, these two graphs suggest that behavioral and psychological tendencies may be closely connected to reported drug consumption patterns.
 
-::: {#cr-impulsive}
 ```{r}
 impulsivity_plot
 ```
-:::
 
 
-The five NEO personality traits show that psychological dimensions do not all relate to drug use in the same way. Some traits display clearer directional patterns, while others remain relatively flat or inconsistent across score ranges. Openness, extraversion, and neuroticism appear more positively associated with reported drug use, while conscientiousness tends to show the opposite pattern. The variation across traits reinforces the idea that personality may provide deeper insight into drug-use behavior than demographic categories alone. @cr-personality
+The five NEO personality traits show that psychological dimensions do not all relate to drug use in the same way. Some traits display clearer directional patterns, while others remain relatively flat or inconsistent across score ranges. Openness, extraversion, and neuroticism appear more positively associated with reported drug use, while conscientiousness tends to show the opposite pattern. The variation across traits reinforces the idea that personality may provide deeper insight into drug-use behavior than demographic categories alone.
 
-::: {#cr-personality}
 ```{r}
 personality_plot
 ```
-:::
 
-:::{.narrative}
 ## Section 6: Personality Traits by Specific Drugs
-:::
 
 ```{r}
 # Select drugs for comparison
@@ -931,14 +886,12 @@ sensation_drug_plot <- ggplot(
     )
 ```
 
-The previous section showed how sensation-seeking is strongly associated with overall drug use. This graph looks more closely at whether that relationship looks equal across the different substances. Instead of treating drug use as just one broad category on its own, this graph compares the reported use of cannabis, cocaine, ecstasy, mushrooms, and other substances across their sensation-seeking scores. This will show whether certain drugs rise more sharply among higher sensation-seeking respondents. @cr-sensation-drugs
+The previous section showed how sensation-seeking is strongly associated with overall drug use. This graph looks more closely at whether that relationship looks equal across the different substances. Instead of treating drug use as just one broad category on its own, this graph compares the reported use of cannabis, cocaine, ecstasy, mushrooms, and other substances across their sensation-seeking scores. This will show whether certain drugs rise more sharply among higher sensation-seeking respondents.
 
-::: {#cr-sensation-drugs}
 ```{r}
 sensation_drug_plot
 ```
 
-:::
 
 ```{r}
 # Create trait data in long format
@@ -1059,17 +1012,13 @@ trait_drug_heatmap <- ggplot(
     )
 ```
 
-This heatmap expands the comparison across multiple personality traits and substances. Each cell shows the difference in the reported use between respondents with higher scores vs. lower scores for that trait. Positive values mean use is more common among higher-scoring respondents, while negative values mean that use is more common among lower-scoring ones. This makes it easier to see which combinations of traits and drugs stand out. @cr-trait-drug
+This heatmap expands the comparison across multiple personality traits and substances. Each cell shows the difference in the reported use between respondents with higher scores vs. lower scores for that trait. Positive values mean use is more common among higher-scoring respondents, while negative values mean that use is more common among lower-scoring ones. This makes it easier to see which combinations of traits and drugs stand out.
 
-::: {#cr-trait-drug}
 ```{r}
 trait_drug_heatmap
 ```
-:::
 
-:::{.narrative}
 ## Section 7: Conclusion
-:::
 
 ```{r}
 # Create summary effect sizes for major variables
@@ -1113,10 +1062,8 @@ summary_plot <- ggplot(
   )
 ```
 
-The final graph summarizes which variables show the largest differences in reported drug use across the dataset. While demographic factors like age, gender, and education help explain some variation, personality and psychological traits — especially sensation seeking and impulsivity — appear to show the strongest relationships with reported drug use. Overall, the project suggests that drug use behavior may be shaped not only by demographic background, but also by deeper behavioral and psychological tendencies. @cr-summary
+The final graph summarizes which variables show the largest differences in reported drug use across the dataset. While demographic factors like age, gender, and education help explain some variation, personality and psychological traits — especially sensation seeking and impulsivity — appear to show the strongest relationships with reported drug use. Overall, the project suggests that drug use behavior may be shaped not only by demographic background, but also by deeper behavioral and psychological tendencies.
 
-::: {#cr-summary}
 ```{r}
 summary_plot
 ```
-:::

@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Drug Usage Exploration</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="final_project_ini_v2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="final_project_ini_v2_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="final_project_ini_v2_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="final_project_ini_v2_files/libs/quarto-html/popper.min.js"></script>
+<script src="final_project_ini_v2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="final_project_ini_v2_files/libs/quarto-html/anchor.min.js"></script>
+<link href="final_project_ini_v2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="final_project_ini_v2_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="final_project_ini_v2_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="final_project_ini_v2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="final_project_ini_v2_files/libs/bootstrap/bootstrap-993f4f36dfae26c4634ef09b1376b878.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="final_project_ini_v2_files/libs/quarto-contrib/intersection-observer-polyfill-1.0.0/intersection-observer.js"></script>
+<script src="final_project_ini_v2_files/libs/quarto-contrib/scrollama-3.2.0/scrollama.min.js"></script>
+<script src="final_project_ini_v2_files/libs/quarto-contrib/closeread-0.1.0/closeread.js"></script>
+<meta cr-debug-mode="false">
+<meta cr-remove-header-space="false">
+
+
+<link rel="stylesheet" href="_extensions/qmd-lab/closeread/closeread.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-full">
+
+<main class="content column-page" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Drug Usage Exploration</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<style>
+body {
+  background-color: #FAF3E0 ;
+}
+.cr-section {
+  background-color: #FFE5B4 ;
+}
+</style>
+<section id="drug-use-is-not-evenly-distributed-across-the-population.-it-varies-first-by-broad-demographics-then-by-education-and-most-strongly-by-personalitypsychological-traits-like-sensation-seeking-impulsivity-and-openness." class="level1">
+<h1>Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness.</h1>
+</section>
+<section id="section-1-introductiondataset-context" class="level1">
+<h1>Section 1: Introduction/Dataset Context</h1>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "da36536.0001"    "pandoc_dir"      "quarto_bin_path"</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,885
+Columns: 32
+$ ID          &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,…
+$ AGE         &lt;fct&gt; Ag3, Ag2, Ag3, Ag1, Ag3, Ag6, Ag4, Ag3, Ag3, Ag5, Ag2, Ag4…
+$ GENDER      &lt;fct&gt; F, M, M, F, F, F, M, M, F, M, F, M, F, F, F, M, F, M, M, M…
+$ EDUCATION   &lt;fct&gt; Ed6, Ed9, Ed6, Ed8, Ed9, Ed4, Ed8, Ed2, Ed6, Ed8, Ed7, Ed5…
+$ COUNTRY     &lt;fct&gt; UK, UK, UK, UK, UK, CA, US, UK, CA, UK, UK, OT, UK, CA, UK…
+$ ETHNICITY   &lt;fct&gt; WA, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH…
+$ NSCORE      &lt;fct&gt; S39, S29, S31, S34, S43, S29, S31, S24, S42, S33, S26, S24…
+$ ESCORE      &lt;fct&gt; S36, S52, S45, S34, S28, S38, S32, S52, S55, S40, S45, S40…
+$ OSCORE      &lt;fct&gt; S42, S55, S40, S46, S43, S35, S43, S40, S39, S36, S38, S47…
+$ ASCORE      &lt;fct&gt; S37, S48, S32, S47, S41, S55, S41, S41, S48, S47, S38, S30…
+$ CSCORE      &lt;fct&gt; S42, S41, S34, S46, S50, S52, S48, S52, S49, S43, S53, S38…
+$ IMPULSIVITY &lt;fct&gt; I3, I2, I1, I1, I3, I1, I3, I4, I1, I1, I4, I5, I7, I2, I7…
+$ SS          &lt;fct&gt; SS02, SS05, SS07, SS02, SS05, SS01, SS06, SS04, SS01, SS03…
+$ ALCOHOL     &lt;fct&gt; CL5, CL5, CL6, CL4, CL4, CL2, CL6, CL5, CL4, CL6, CL5, CL5…
+$ AMPHET      &lt;fct&gt; CL2, CL2, CL0, CL0, CL1, CL0, CL0, CL0, CL0, CL1, CL0, CL1…
+$ AMYL        &lt;fct&gt; CL0, CL2, CL0, CL0, CL1, CL0, CL0, CL0, CL0, CL0, CL1, CL0…
+$ BENZOS      &lt;fct&gt; CL2, CL0, CL0, CL3, CL0, CL0, CL0, CL0, CL0, CL1, CL0, CL0…
+$ CAFF        &lt;fct&gt; CL6, CL6, CL6, CL5, CL6, CL6, CL6, CL6, CL6, CL6, CL6, CL6…
+$ CANNABIS    &lt;fct&gt; CL0, CL4, CL3, CL2, CL3, CL0, CL1, CL0, CL0, CL1, CL2, CL4…
+$ CHOC        &lt;fct&gt; CL5, CL6, CL4, CL4, CL6, CL4, CL5, CL4, CL6, CL6, CL5, CL5…
+$ COKE        &lt;fct&gt; CL0, CL3, CL0, CL2, CL0, CL0, CL0, CL0, CL0, CL0, CL2, CL2…
+$ CRACK       &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
+$ ECSTASY     &lt;fct&gt; CL0, CL4, CL0, CL0, CL1, CL0, CL0, CL0, CL0, CL0, CL0, CL3…
+$ HEROIN      &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
+$ KETAMINE    &lt;fct&gt; CL0, CL2, CL0, CL2, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
+$ LEGALH      &lt;fct&gt; CL0, CL0, CL0, CL0, CL1, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
+$ LSD         &lt;fct&gt; CL0, CL2, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1…
+$ METH        &lt;fct&gt; CL0, CL3, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
+$ MUSHROOMS   &lt;fct&gt; CL0, CL0, CL1, CL0, CL2, CL0, CL0, CL0, CL0, CL0, CL0, CL2…
+$ NICOTINE    &lt;fct&gt; CL2, CL4, CL0, CL2, CL2, CL6, CL6, CL0, CL6, CL6, CL2, CL6…
+$ SEMER       &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
+$ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1, CL0…</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       ID          AGE      GENDER    EDUCATION   COUNTRY   ETHNICITY
+ Min.   :   1.0   Ag1:643   F:942   Ed5    :506   AU:  54   AS:  26  
+ 1st Qu.: 474.0   Ag2:481   M:943   Ed7    :480   CA:  87   BA:   3  
+ Median : 946.0   Ag3:356           Ed8    :283   IE:  20   BL:  33  
+ Mean   : 945.3   Ag4:294           Ed6    :270   NZ:   5   OT:  63  
+ 3rd Qu.:1417.0   Ag5: 93           Ed4    :100   OT: 118   WA:  20  
+ Max.   :1888.0   Ag6: 18           Ed2    : 99   UK:1044   WB:  20  
+                                    (Other):147   US: 557   WH:1720  
+     NSCORE         ESCORE         OSCORE         ASCORE         CSCORE    
+ S31    :  87   S40    : 130   S46    : 134   S44    : 118   S46    : 113  
+ S40    :  80   S41    : 116   S48    : 116   S41    : 114   S44    : 111  
+ S32    :  78   S42    : 109   S47    : 107   S45    : 112   S45    : 111  
+ S42    :  77   S39    : 107   S45    : 103   S43    : 105   S42    : 105  
+ S34    :  76   S38    : 106   S44    : 101   S48    : 104   S41    :  99  
+ S36    :  73   S43    : 105   S49    :  98   S39    : 102   S40    :  97  
+ (Other):1414   (Other):1212   (Other):1226   (Other):1230   (Other):1249  
+  IMPULSIVITY        SS      ALCOHOL   AMPHET     AMYL      BENZOS    
+ I3     :355   SS07   :249   CL0: 34   CL0:976   CL0:1305   CL0:1000  
+ I2     :307   SS05   :223   CL1: 34   CL1:230   CL1: 210   CL1: 116  
+ I1     :276   SS06   :219   CL2: 68   CL2:243   CL2: 237   CL2: 234  
+ I4     :257   SS04   :211   CL3:198   CL3:198   CL3:  92   CL3: 236  
+ I5     :216   SS08   :211   CL4:287   CL4: 75   CL4:  24   CL4: 120  
+ I6     :195   SS09   :210   CL5:759   CL5: 61   CL5:  14   CL5:  84  
+ (Other):279   (Other):562   CL6:505   CL6:102   CL6:   3   CL6:  95  
+  CAFF      CANNABIS   CHOC      COKE      CRACK      ECSTASY    HEROIN    
+ CL0:  27   CL0:413   CL0: 32   CL0:1038   CL0:1627   CL0:1021   CL0:1605  
+ CL1:  10   CL1:207   CL1:  3   CL1: 160   CL1:  67   CL1: 113   CL1:  68  
+ CL2:  24   CL2:266   CL2: 10   CL2: 270   CL2: 112   CL2: 234   CL2:  94  
+ CL3:  60   CL3:211   CL3: 54   CL3: 258   CL3:  59   CL3: 277   CL3:  65  
+ CL4: 106   CL4:140   CL4:296   CL4:  99   CL4:   9   CL4: 156   CL4:  24  
+ CL5: 273   CL5:185   CL5:683   CL5:  41   CL5:   9   CL5:  63   CL5:  16  
+ CL6:1385   CL6:463   CL6:807   CL6:  19   CL6:   2   CL6:  21   CL6:  13  
+ KETAMINE   LEGALH      LSD        METH      MUSHROOMS NICOTINE  SEMER     
+ CL0:1490   CL0:1094   CL0:1069   CL0:1429   CL0:982   CL0:428   CL0:1877  
+ CL1:  45   CL1:  29   CL1: 259   CL1:  39   CL1:209   CL1:193   CL1:   2  
+ CL2: 142   CL2: 198   CL2: 177   CL2:  97   CL2:260   CL2:204   CL2:   3  
+ CL3: 129   CL3: 323   CL3: 214   CL3: 149   CL3:275   CL3:185   CL3:   2  
+ CL4:  42   CL4: 110   CL4:  97   CL4:  50   CL4:115   CL4:108   CL4:   1  
+ CL5:  33   CL5:  64   CL5:  56   CL5:  48   CL5: 40   CL5:157             
+ CL6:   4   CL6:  67   CL6:  13   CL6:  73   CL6:  4   CL6:610             
+  VSA      
+ CL0:1455  
+ CL1: 200  
+ CL2: 135  
+ CL3:  61  
+ CL4:  13  
+ CL5:  14  
+ CL6:   7  </code></pre>
+</div>
+<div class="cell-output-display">
+<div id="ogmboepqmg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ogmboepqmg table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ogmboepqmg thead, #ogmboepqmg tbody, #ogmboepqmg tfoot, #ogmboepqmg tr, #ogmboepqmg td, #ogmboepqmg th {
+  border-style: none;
+}
+
+#ogmboepqmg p {
+  margin: 0;
+  padding: 0;
+}
+
+#ogmboepqmg .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ogmboepqmg .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ogmboepqmg .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ogmboepqmg .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ogmboepqmg .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ogmboepqmg .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ogmboepqmg .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ogmboepqmg .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ogmboepqmg .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ogmboepqmg .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ogmboepqmg .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ogmboepqmg .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ogmboepqmg .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ogmboepqmg .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ogmboepqmg .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ogmboepqmg .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ogmboepqmg .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ogmboepqmg .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ogmboepqmg .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ogmboepqmg .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ogmboepqmg .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ogmboepqmg .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ogmboepqmg .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ogmboepqmg .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ogmboepqmg .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ogmboepqmg .gt_left {
+  text-align: left;
+}
+
+#ogmboepqmg .gt_center {
+  text-align: center;
+}
+
+#ogmboepqmg .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ogmboepqmg .gt_font_normal {
+  font-weight: normal;
+}
+
+#ogmboepqmg .gt_font_bold {
+  font-weight: bold;
+}
+
+#ogmboepqmg .gt_font_italic {
+  font-style: italic;
+}
+
+#ogmboepqmg .gt_super {
+  font-size: 65%;
+}
+
+#ogmboepqmg .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ogmboepqmg .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ogmboepqmg .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ogmboepqmg .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ogmboepqmg .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ogmboepqmg .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ogmboepqmg .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#ogmboepqmg .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#ogmboepqmg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="2" class="gt_heading gt_title gt_font_normal">Dataset Overview</td>
+</tr>
+<tr class="gt_heading even">
+<td colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Drug Consumption Survey Dataset</td>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Category" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Category</th>
+<th id="Description" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Description</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Category">Number of respondents</td>
+<td class="gt_row gt_left" headers="Description">1885</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Category">Number of variables</td>
+<td class="gt_row gt_left" headers="Description">33</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Category">Drug use definition</td>
+<td class="gt_row gt_left" headers="Description">User = respondent reported use of cannabis, coke, or ecstasy</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Category">Drug variables used for current prototype</td>
+<td class="gt_row gt_left" headers="Description">Cannabis, coke, ecstasy</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Category">Demographic variables</td>
+<td class="gt_row gt_left" headers="Description">Age, gender, education, country, ethnicity</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Category">Personality variables</td>
+<td class="gt_row gt_left" headers="Description">Neuroticism, extraversion, openness, agreeableness, conscientiousness, impulsivity, sensation seeking</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Category">Survey population</td>
+<td class="gt_row gt_left" headers="Description">Adults from English-speaking countries</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>This dataset contains individual survey responses about demographics, personality traits, and drug consumption. For this prototype, we define a respondent as a “User” if they reported any use of cannabis, coke, or ecstasy. This gives us a simplified outcome variable that lets us compare drug use patterns across demographic and psychological factors.</p>
+<!-- # Section 2: Baseline Drug Use Patterns 
+Communication Goal -> Establish the basic question: who reports drug use at all? -->
+<!-- END OF section 1 & 2 ---------------------------------------------------------------------------    -->
+<!-- section 4 -->
+<!-- end of section 4 -->
+<!-- start of section 5 -->
+<!-- end of section 5 -->
+<div class="cr-section cr-column-screen sidebar-left">
+<div class="narrative-col">
+<div class="trigger">
+<div class="narrative">
+<section id="section-2-baseline-drug-use-patterns" class="level2">
+<h2 class="anchored" data-anchor-id="section-2-baseline-drug-use-patterns">Section 2: Baseline Drug Use Patterns</h2>
+</section>
+<section id="lets-establish-the-basic-question-who-reports-drug-use-at-all" class="level2">
+<h2 class="anchored" data-anchor-id="lets-establish-the-basic-question-who-reports-drug-use-at-all">Lets establish the basic question: who reports drug use at all?</h2>
+</section>
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-overall">
+<div class="narrative">
+<p>This graph establishes the baseline distribution of drug usage within the dataset using our simplified classification system. Respondents were categorized as “Users” if they reported any cannabis, coke, or ecstasy use, while all others were labeled “Non-users.” Almost 80% of respondents fall into the “User” category, suggesting that some level of reported drug use is relatively common within this survey population. This baseline helps contextualize the demographic and personality-based patterns explored in later sections of the project.</p>
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-age">
+<div class="narrative">
+<p>This graph shows a strong relationship between age and reported drug use within the survey population. Respondents in the youngest age group, 18–24, had the highest share of reported drug use, with usage steadily decreasing across older age groups. By the 65+ category, non-users make up the majority of respondents. This pattern suggests that younger individuals in the dataset are substantially more likely to report drug use than older respondents, making age one of the clearest demographic trends in the project.</p>
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-gender">
+<div class="narrative">
+<p>This graph shows noticeable differences in reported drug use across gender groups within the dataset. Male respondents report higher levels of drug use overall, with almost 90% categorized as “Users,” compared to a lower share among female respondents. While both groups contain a majority of users, the gap suggests that gender may play a role in reported drug consumption patterns. Together with the age analysis, this graph helps establish demographic trends before exploring more detailed personality-based relationships later in the project.</p>
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-agegender">
+<div class="narrative">
+<p>This graph combines the project’s two strongest demographic patterns: age and gender. Across both male and female respondents, reported drug use is highest among younger age groups and generally declines with age. However, the decline is more pronounced among female respondents, where the proportion of non-users increases substantially in older age categories. Male respondents consistently report higher levels of drug use across nearly every age group. By comparing both demographics simultaneously, this visualization shows that age-related patterns remain visible across genders while also highlighting an overall gender gap in reported drug use.</p>
+</div>
+</div>
+<div class="trigger">
+<div class="narrative">
+<section id="section-3-education-and-drug-use" class="level2">
+<h2 class="anchored" data-anchor-id="section-3-education-and-drug-use">Section 3: Education and Drug Use</h2>
+</section>
+<section id="does-socialdemographic-structure-beyond-age-and-gender-relate-to-drug-use" class="level2">
+<h2 class="anchored" data-anchor-id="does-socialdemographic-structure-beyond-age-and-gender-relate-to-drug-use">Does social/demographic structure beyond age and gender relate to drug use?</h2>
+</section>
+</div>
+</div>
+<div class="trigger">
+<div class="cell narrative">
+
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-education">
+<div class="narrative">
+<p>Education gives a more complex view of drug use because it may reflect age, opportunity, social environment, or life stage. Rather than showing a simple linear pattern, this graph helps us ask whether certain education groups report higher or lower drug use.</p>
+</div>
+</div>
+<div class="trigger">
+<div class="cell narrative">
+
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-education-age">
+<div class="narrative">
+<p>Because education level is closely tied to age, we include this graph to avoid over-interpreting education alone. If some education categories contain more young respondents, then higher drug use in those groups may partly reflect age rather than education itself.</p>
+</div>
+</div>
+<div class="trigger">
+<div class="cell narrative">
+
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-education-age-drug">
+<div class="narrative">
+<p>This graph makes the education section more careful and convincing. By comparing education levels within age groups, we can see whether education still appears related to drug use after accounting for age differences.</p>
+</div>
+</div>
+<div class="trigger">
+<div class="narrative">
+<section id="section-4-which-drugs-are-most-common" class="level2">
+<h2 class="anchored" data-anchor-id="section-4-which-drugs-are-most-common">Section 4: Which Drugs are Most Common?</h2>
+</section>
+<section id="lets-examine-which-drugs-are-most-commonly-reported." class="level2">
+<h2 class="anchored" data-anchor-id="lets-examine-which-drugs-are-most-commonly-reported.">Let’s examine which drugs are most commonly reported.</h2>
+</section>
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-drugtotal">
+<div class="narrative">
+<p>Drug use is a broad term. This graph establishes that the most commonly used drugs across respondents is caffeine, chocolate, and alchol, with almost an 100% rate. As such, this data demonstrates that most people who answer the survey will be categorized as a drug user. Over 75% of users reported consuming cannabis and nicotine and many of the illegal drugs reported a lower percentage of users. These patterns suggest that the most commonly used substances are typically legal and easy to obtain. It also demonstrates a social aspect to drug usage as the majority of the most commonly used drugs are socially acceptable to consume.</p>
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-drugfrequency">
+<div class="narrative">
+<p>This graph shows that most drugs are not used frequently. However, if respondents are using certain drugs with a frequency, those drugs tend to be alcohol, caffeine, cannabis, chocolate, and nicotine. As shown with the drug use graph, this data helps to reinforce that socially acceptable, legal drugs are utilized more. This graph also helps to show a difference between reporting use of a drug and actually consuming it regularly. While an individual may report consuming a drug, it may be experimental (once or twice) rather than frequent. Some drugs may also have less people using them, but they are using them with more frequency - like mushrooms or ecstasy.</p>
+</div>
+</div>
+<div class="trigger">
+<section id="section-5-personality-traits-drug-use" class="level2 narrative">
+<h2 class="anchored" data-anchor-id="section-5-personality-traits-drug-use">Section 5: Personality Traits &amp; Drug Use</h2>
+</section>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-sensation">
+<div class="narrative">
+<p>This graph shows one of the clearest relationships in the project. As sensation-seeking scores increase, the proportion of respondents reporting drug use rises substantially. Lower sensation-seeking groups contain larger shares of non-users, while higher-scoring groups are dominated by users. Compared with the earlier demographic graphs, the pattern here appears stronger and more consistent, suggesting that personality traits may explain drug use behavior more effectively than age or gender alone.</p>
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-impulsive">
+<div class="narrative">
+<p>Impulsivity shows a similar pattern to sensation seeking, though the relationship appears somewhat weaker. Respondents with higher impulsivity scores generally report higher levels of drug use, while lower-scoring groups contain larger shares of non-users. Together, these two graphs suggest that behavioral and psychological tendencies may be closely connected to reported drug consumption patterns.</p>
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-personality">
+<div class="narrative">
+<p>The five NEO personality traits show that psychological dimensions do not all relate to drug use in the same way. Some traits display clearer directional patterns, while others remain relatively flat or inconsistent across score ranges. Openness, extraversion, and neuroticism appear more positively associated with reported drug use, while conscientiousness tends to show the opposite pattern. The variation across traits reinforces the idea that personality may provide deeper insight into drug-use behavior than demographic categories alone.</p>
+</div>
+</div>
+<div class="trigger">
+<section id="section-6-personality-traits-by-specific-drugs" class="level2 narrative">
+<h2 class="anchored" data-anchor-id="section-6-personality-traits-by-specific-drugs">Section 6: Personality Traits by Specific Drugs</h2>
+</section>
+</div>
+<div class="trigger">
+<div class="cell narrative">
+
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-sensation-drugs">
+<div class="narrative">
+<p>The previous section showed how sensation-seeking is strongly associated with overall drug use. This graph looks more closely at whether that relationship looks equal across the different substances. Instead of treating drug use as just one broad category on its own, this graph compares the reported use of cannabis, cocaine, ecstasy, mushrooms, and other substances across their sensation-seeking scores. This will show whether certain drugs rise more sharply among higher sensation-seeking respondents.</p>
+</div>
+</div>
+<div class="trigger">
+<div class="cell narrative">
+
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-trait-drug">
+<div class="narrative">
+<p>This heatmap expands the comparison across multiple personality traits and substances. Each cell shows the difference in the reported use between respondents with higher scores vs.&nbsp;lower scores for that trait. Positive values mean use is more common among higher-scoring respondents, while negative values mean that use is more common among lower-scoring ones. This makes it easier to see which combinations of traits and drugs stand out.</p>
+</div>
+</div>
+<div class="trigger">
+<section id="section-7-conclusion" class="level2 narrative">
+<h2 class="anchored" data-anchor-id="section-7-conclusion">Section 7: Conclusion</h2>
+</section>
+</div>
+<div class="trigger">
+<div class="cell narrative">
+
+</div>
+</div>
+<div class="trigger new-trigger" data-focus-on="cr-summary">
+<div class="narrative">
+<p>The final graph summarizes which variables show the largest differences in reported drug use across the dataset. While demographic factors like age, gender, and education help explain some variation, personality and psychological traits — especially sensation seeking and impulsivity — appear to show the strongest relationships with reported drug use. Overall, the project suggests that drug use behavior may be shaped not only by demographic background, but also by deeper behavioral and psychological tendencies.</p>
+</div>
+</div>
+</div>
+<div class="sticky-col">
+<div class="sticky-col-stack">
+<div id="cr-overall" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-age" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-gender" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-agegender" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-education" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-education-age" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-education-age-drug" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-drugtotal" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-drugfrequency" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-sensation" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-impulsive" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-personality" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-sensation-drugs" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-trait-drug" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="cr-summary" class="sticky">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
