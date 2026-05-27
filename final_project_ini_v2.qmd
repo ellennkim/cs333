@@ -302,7 +302,75 @@ agebygender_plot <- ggplot(
 ```
 
 
-<!-- END OF OUTLINE ---------------------------------------------------------------------------    -->
+<!-- END OF section 1 & 2 ---------------------------------------------------------------------------    -->
+
+
+<!-- section 4 -->
+
+```{r}
+drug_total <- drug_data |>
+  pivot_longer(
+    cols = c(ALCOHOL, AMPHET, AMYL, BENZOS, CAFF, CANNABIS, CHOC, 
+             COKE, CRACK, ECSTASY, HEROIN, KETAMINE, LEGALH, LSD, 
+             METH, MUSHROOMS, NICOTINE, SEMER, VSA), 
+    names_to = "name",
+    values_to = "usage"
+  ) |>
+  mutate(any_use = ifelse(usage == "CL0", 0,1))
+
+# creating the graph
+drug_total_plot <- drug_total |>
+  group_by(name) |>
+  summarize(percent_user = mean(any_use == 1)) |>
+  ggplot(aes(x = reorder(name, percent_user), y = percent_user)) +
+  geom_col(fill = "#F07A70") +
+  coord_flip() +
+  scale_y_continuous(labels = percent) +
+  labs(
+    title = "Most Commonly Reported Drug Usage",
+    x = "Drug",
+    y = "Percent of Users Reporting Use", 
+    subtitle = "Share of Users for Each Drug"
+  ) +
+  theme_minimal(base_size=14)
+```
+
+```{r}
+
+drug_freq <- drug_data |>
+  pivot_longer(
+    cols = c(ALCOHOL, AMPHET, AMYL, BENZOS, CAFF, CANNABIS, CHOC, COKE, CRACK, ECSTASY, HEROIN, KETAMINE, LEGALH, LSD, 
+    METH, MUSHROOMS, NICOTINE, SEMER, VSA), 
+    names_to = "name",
+    values_to = "freq"
+  ) |>
+  count(name, freq) |>
+  group_by(name) |>
+  mutate(percent = n / sum(n)) |>
+  ungroup()
+
+
+#creating graph var
+drug_freq_plot <- ggplot(drug_freq, aes(x = freq, y = name, fill = percent)) +
+  geom_tile() +
+  scale_fill_gradient(low = "#FFF5F7", high = "#F07A70") +
+  scale_x_discrete(labels = c(
+    "CL0" = "Never Used",
+    "CL1" = "Used 10+ Years Ago", 
+    "CL2" = "Used in Last Decade", 
+    "CL3" = "Used in Last Year", 
+    "CL4" = "Used in Last Month", 
+    "CL5" = "Used in Last Week" , 
+    "CL6" = "Used in Last Day")) +
+  labs(
+    title = "Drug Use Frequency Across Substances",
+    x = "Reported Frequency Category",
+    y = "Drug",
+    fill = "Percent"
+  )
+```
+
+<!-- end of section 4 -->
 
 
 ::: {.cr-section}
@@ -355,8 +423,25 @@ agebygender_plot
 
 :::{.narrative}
 ## Section 4: Which Drugs are Most Common?
+## Let's examine which drugs are most commonly reported.
 :::
----- ADD graphs + analysis here (follow earlier structure) ---
+
+
+Drug use is a broad term. This graph establishes that the most commonly used drugs across respondents is caffeine, chocolate, and alchol, with almost an 100% rate. As such, this data demonstrates that most people who answer the survey will be categorized as a drug user. Over 75% of users reported consuming cannabis and nicotine and many of the illegal drugs reported a lower percentage of users. These patterns suggest that the most commonly used substances are typically legal and easy to obtain. It also demonstrates a social aspect to drug usage as the majority of the most commonly used drugs are socially acceptable to consume. @cr-drugtotal
+
+::: {#cr-drugtotal}
+```{r}
+drug_total_plot
+```
+:::
+
+This graph shows that most drugs are not used frequently. However, if respondents are using certain drugs with a frequency, those drugs tend to be alcohol, caffeine, cannabis, chocolate, and nicotine. As shown with the drug use graph, this data helps to reinforce that socially acceptable, legal drugs are utilized more. This graph also helps to show a difference between reporting use of a drug and actually consuming it regularly. While an individual may report consuming a drug, it may be experimental (once or twice) rather than frequent. Some drugs may also have less people using them, but they are using them with more frequency - like mushrooms or ecstasy. @cr-drugfrequency
+
+::: {#cr-drugfrequency}
+```{r}
+drug_freq_plot
+```
+:::
 
 :::{.narrative}
 ## Section 5: Personality Traits & Drug Use
