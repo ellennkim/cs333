@@ -19,7 +19,7 @@ body {
 </style>
 
 
-# Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness.. 
+# Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness.
 
 # Section 1: Introduction/Dataset Context 
 
@@ -352,7 +352,12 @@ drug_total_plot <- drug_total |>
     y = "Percent of Users Reporting Use", 
     subtitle = "Share of Users for Each Drug"
   ) +
-  theme_minimal(base_size=14)
+  theme_minimal(base_size=14) + 
+  theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.text = element_text(face = "bold"),
+        legend.position = "right")
 ```
 
 ```{r}
@@ -387,10 +392,182 @@ drug_freq_plot <- ggplot(drug_freq, aes(x = freq, y = name, fill = percent)) +
     x = "Reported Frequency Category",
     y = "Drug",
     fill = "Percent"
-  )
+  ) + 
+  theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.text = element_text(face = "bold"),
+        legend.position = "right")
 ```
 
 <!-- end of section 4 -->
+
+<!-- start of section 5 -->
+
+```{r}
+ss_summary <- drug_data |>
+    mutate(
+        sensation_score = factor(SS)
+    ) |>
+    count(sensation_score, any_drug_use) |>
+    group_by(sensation_score) |>
+    mutate(
+        percent = n / sum(n)
+    ) |>
+    ungroup()
+
+# Plot
+sensation_plot <- ggplot(
+    ss_summary,
+    aes(
+        x = sensation_score,
+        y = percent,
+        fill = any_drug_use
+    )
+) +
+    geom_col(width = 0.75) +
+    scale_y_continuous(
+        labels = scales::percent,
+        limits = c(0, 1)
+    ) +
+    scale_fill_manual(
+        values = c(
+            "User" = "#20B8C4",
+            "Non-user" = "#F07A70"
+        )
+    ) +
+    labs(
+        title = "Higher Sensation Seeking Is Associated With Higher Drug Use",
+        x = "Sensation-seeking score",
+        y = "Percent",
+        fill = "Drug use"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "right"
+    )
+```
+
+```{r}
+# Create impulsivity summary
+impulsivity_summary <- drug_data |>
+    mutate(
+        impulsivity_score = factor(IMPULSIVITY)
+    ) |>
+    count(impulsivity_score, any_drug_use) |>
+    group_by(impulsivity_score) |>
+    mutate(
+        percent = n / sum(n)
+    ) |>
+    ungroup()
+
+# Plot
+impulsivity_plot <- ggplot(
+    impulsivity_summary,
+    aes(
+        x = impulsivity_score,
+        y = percent,
+        fill = any_drug_use
+    )
+) +
+    geom_col(width = 0.75) +
+    scale_y_continuous(
+        labels = scales::percent,
+        limits = c(0, 1)
+    ) +
+    scale_fill_manual(
+        values = c(
+            "User" = "#20B8C4",
+            "Non-user" = "#F07A70"
+        )
+    ) +
+    labs(
+        title = "Drug Use Also Rises Across Impulsivity Scores",
+        x = "Impulsivity score",
+        y = "Percent",
+        fill = "Drug use"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "right"
+    )
+```
+
+```{r}
+personality_long <- drug_data |>
+    mutate(
+        user_numeric = ifelse(any_drug_use == "User", 1, 0)
+    ) |>
+    select(
+        user_numeric,
+        NSCORE,
+        ESCORE,
+        OSCORE,
+        ASCORE,
+        CSCORE
+    ) |>
+    pivot_longer(
+        cols = -user_numeric,
+        names_to = "trait_name",
+        values_to = "trait_score"
+    ) |>
+    # convert ordered categories to numeric scale
+    mutate(
+        trait_score_num = as.numeric(factor(trait_score))
+    ) |>
+    group_by(trait_name, trait_score_num) |>
+    summarise(
+        percent_user = mean(user_numeric),
+        .groups = "drop"
+    )
+
+# ---- plot ----
+personality_plot <- ggplot(
+    personality_long,
+    aes(
+        x = trait_score_num,
+        y = percent_user,
+        color = trait_name,
+        group = trait_name
+    )
+) +
+    geom_smooth(se = FALSE, linewidth = 1.3, method = "loess") +
+    scale_y_continuous(labels = percent, limits = c(0, 1)) +
+    scale_x_continuous(breaks = pretty_breaks(n = 5)) +
+    scale_color_manual(
+        values = c(
+            NSCORE = "#F07A70",
+            ESCORE = "#20B8C4",
+            OSCORE = "#7A5CF0",
+            ASCORE = "#3FA34D",
+            CSCORE = "#F2B134"
+        ),
+        labels = c(
+            NSCORE = "Neuroticism",
+            ESCORE = "Extraversion",
+            OSCORE = "Openness",
+            ASCORE = "Agreeableness",
+            CSCORE = "Conscientiousness"
+        )
+    ) +
+    labs(
+        title = "Personality Traits Show Different Relationships With Drug Use",
+        x = "Trait score",
+        y = "Percent reporting drug use",
+        color = "Trait"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        legend.position = "right",
+        plot.title = element_text(face = "bold")
+    )
+```
+
+<!-- end of section 5 -->
 
 
 ::: {.cr-section}
@@ -466,52 +643,7 @@ drug_freq_plot
 :::{.narrative}
 ## Section 5: Personality Traits & Drug Use
 :::
----- ADD graphs + analysis here (follow earlier structure) ---
-```{r}
-ss_summary <- drug_data |>
-    mutate(
-        sensation_score = factor(SS)
-    ) |>
-    count(sensation_score, any_drug_use) |>
-    group_by(sensation_score) |>
-    mutate(
-        percent = n / sum(n)
-    ) |>
-    ungroup()
 
-# Plot
-sensation_plot <- ggplot(
-    ss_summary,
-    aes(
-        x = sensation_score,
-        y = percent,
-        fill = any_drug_use
-    )
-) +
-    geom_col(width = 0.75) +
-    scale_y_continuous(
-        labels = scales::percent,
-        limits = c(0, 1)
-    ) +
-    scale_fill_manual(
-        values = c(
-            "User" = "#20B8C4",
-            "Non-user" = "#F07A70"
-        )
-    ) +
-    labs(
-        title = "Higher Sensation Seeking Is Associated With Higher Drug Use",
-        x = "Sensation-seeking score",
-        y = "Percent",
-        fill = "Drug use"
-    ) +
-    theme_minimal(base_size = 14) +
-    theme(
-        plot.title = element_text(face = "bold"),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "right"
-    )
-```
 
 This graph shows one of the clearest relationships in the project. As sensation-seeking scores increase, the proportion of respondents reporting drug use rises substantially. Lower sensation-seeking groups contain larger shares of non-users, while higher-scoring groups are dominated by users. Compared with the earlier demographic graphs, the pattern here appears stronger and more consistent, suggesting that personality traits may explain drug use behavior more effectively than age or gender alone. @cr-sensation
 
@@ -521,52 +653,6 @@ sensation_plot
 ```
 :::
 
-```{r}
-# Create impulsivity summary
-impulsivity_summary <- drug_data |>
-    mutate(
-        impulsivity_score = factor(IMPULSIVITY)
-    ) |>
-    count(impulsivity_score, any_drug_use) |>
-    group_by(impulsivity_score) |>
-    mutate(
-        percent = n / sum(n)
-    ) |>
-    ungroup()
-
-# Plot
-impulsivity_plot <- ggplot(
-    impulsivity_summary,
-    aes(
-        x = impulsivity_score,
-        y = percent,
-        fill = any_drug_use
-    )
-) +
-    geom_col(width = 0.75) +
-    scale_y_continuous(
-        labels = scales::percent,
-        limits = c(0, 1)
-    ) +
-    scale_fill_manual(
-        values = c(
-            "User" = "#20B8C4",
-            "Non-user" = "#F07A70"
-        )
-    ) +
-    labs(
-        title = "Drug Use Also Rises Across Impulsivity Scores",
-        x = "Impulsivity score",
-        y = "Percent",
-        fill = "Drug use"
-    ) +
-    theme_minimal(base_size = 14) +
-    theme(
-        plot.title = element_text(face = "bold"),
-        axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "right"
-    )
-```
 
 Impulsivity shows a similar pattern to sensation seeking, though the relationship appears somewhat weaker. Respondents with higher impulsivity scores generally report higher levels of drug use, while lower-scoring groups contain larger shares of non-users. Together, these two graphs suggest that behavioral and psychological tendencies may be closely connected to reported drug consumption patterns. @cr-impulsive
 
@@ -575,76 +661,6 @@ Impulsivity shows a similar pattern to sensation seeking, though the relationshi
 impulsivity_plot
 ```
 :::
-
-```{r}
-personality_long <- drug_data |>
-    mutate(
-        user_numeric = ifelse(any_drug_use == "User", 1, 0)
-    ) |>
-    select(
-        user_numeric,
-        NSCORE,
-        ESCORE,
-        OSCORE,
-        ASCORE,
-        CSCORE
-    ) |>
-    pivot_longer(
-        cols = -user_numeric,
-        names_to = "trait_name",
-        values_to = "trait_score"
-    ) |>
-    # convert ordered categories to numeric scale
-    mutate(
-        trait_score_num = as.numeric(factor(trait_score))
-    ) |>
-    group_by(trait_name, trait_score_num) |>
-    summarise(
-        percent_user = mean(user_numeric),
-        .groups = "drop"
-    )
-
-# ---- plot ----
-personality_plot <- ggplot(
-    personality_long,
-    aes(
-        x = trait_score_num,
-        y = percent_user,
-        color = trait_name,
-        group = trait_name
-    )
-) +
-    geom_smooth(se = FALSE, linewidth = 1.3, method = "loess") +
-    scale_y_continuous(labels = percent, limits = c(0, 1)) +
-    scale_x_continuous(breaks = pretty_breaks(n = 5)) +
-    scale_color_manual(
-        values = c(
-            NSCORE = "#F07A70",
-            ESCORE = "#20B8C4",
-            OSCORE = "#7A5CF0",
-            ASCORE = "#3FA34D",
-            CSCORE = "#F2B134"
-        ),
-        labels = c(
-            NSCORE = "Neuroticism",
-            ESCORE = "Extraversion",
-            OSCORE = "Openness",
-            ASCORE = "Agreeableness",
-            CSCORE = "Conscientiousness"
-        )
-    ) +
-    labs(
-        title = "Personality Traits Show Different Relationships With Drug Use",
-        x = "Trait score",
-        y = "Percent reporting drug use",
-        color = "Trait"
-    ) +
-    theme_minimal(base_size = 14) +
-    theme(
-        legend.position = "right",
-        plot.title = element_text(face = "bold")
-    )
-```
 
 
 The five NEO personality traits show that psychological dimensions do not all relate to drug use in the same way. Some traits display clearer directional patterns, while others remain relatively flat or inconsistent across score ranges. Openness, extraversion, and neuroticism appear more positively associated with reported drug use, while conscientiousness tends to show the opposite pattern. The variation across traits reinforces the idea that personality may provide deeper insight into drug-use behavior than demographic categories alone. @cr-personality
