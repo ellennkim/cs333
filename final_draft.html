@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Drug Usage Exploration</title>
+<title>Drug Use Patterns: Demographics Explain Some Differences, but Personality Explains More</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,17 +26,17 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="final_project_ini_v2_files/libs/clipboard/clipboard.min.js"></script>
-<script src="final_project_ini_v2_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="final_project_ini_v2_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="final_project_ini_v2_files/libs/quarto-html/popper.min.js"></script>
-<script src="final_project_ini_v2_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="final_project_ini_v2_files/libs/quarto-html/anchor.min.js"></script>
-<link href="final_project_ini_v2_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="final_project_ini_v2_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="final_project_ini_v2_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="final_project_ini_v2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="final_project_ini_v2_files/libs/bootstrap/bootstrap-993f4f36dfae26c4634ef09b1376b878.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="final_draft_files/libs/clipboard/clipboard.min.js"></script>
+<script src="final_draft_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="final_draft_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="final_draft_files/libs/quarto-html/popper.min.js"></script>
+<script src="final_draft_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="final_draft_files/libs/quarto-html/anchor.min.js"></script>
+<link href="final_draft_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="final_draft_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="final_draft_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="final_draft_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="final_draft_files/libs/bootstrap/bootstrap-993f4f36dfae26c4634ef09b1376b878.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -49,7 +49,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Drug Usage Exploration</h1>
+<h1 class="title">Drug Use Patterns: Demographics Explain Some Differences, but Personality Explains More</h1>
 </div>
 
 
@@ -66,127 +66,30 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<style>
-body {
-  background-color: #FAF3E0 ;
-}
-.cr-section {
-  background-color: #FFE5B4 ;
-}
-</style>
-<section id="drug-use-is-not-evenly-distributed-across-the-population.-it-varies-first-by-broad-demographics-then-by-education-and-most-strongly-by-personalitypsychological-traits-like-sensation-seeking-impulsivity-and-openness." class="level1">
-<h1>Drug use is not evenly distributed across the population. It varies first by broad demographics, then by education, and most strongly by personality/psychological traits like sensation seeking, impulsivity, and openness.</h1>
-</section>
-<section id="section-1-introductiondataset-context" class="level1">
-<h1>Section 1: Introduction/Dataset Context</h1>
+<p>Drug use is usually discussed through demographic categories such as age, gender, or education level. While these factors do shape patterns of use, they may not fully explain why some individuals are more likely to experiment with or regularly consume drugs than others.</p>
+<p>Using a survey dataset of 1,885 respondents from English-speaking countries, this project explores how demographic characteristics and psychological traits relate to reported drug use. Respondents were categorized as “Users” if they reported any cannabis, cocaine, or ecstasy use.</p>
+<p>Our analysis begins with broad demographic patterns before moving into personality and behavioral traits. While younger respondents and men generally reported higher levels of drug use, the clearest and most consistent relationships appeared in psychological variables such as sensation seeking, impulsivity, and openness. Overall, the findings suggest that drug use behavior may be influenced less by demographic background alone and more by deeper behavioral tendencies tied to risk-taking and novelty-seeking behavior.</p>
+<section id="dataset-overview" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-overview">Dataset Overview</h2>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "da36536.0001"    "pandoc_dir"      "quarto_bin_path"</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Rows: 1,885
-Columns: 32
-$ ID          &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,…
-$ AGE         &lt;fct&gt; Ag3, Ag2, Ag3, Ag1, Ag3, Ag6, Ag4, Ag3, Ag3, Ag5, Ag2, Ag4…
-$ GENDER      &lt;fct&gt; F, M, M, F, F, F, M, M, F, M, F, M, F, F, F, M, F, M, M, M…
-$ EDUCATION   &lt;fct&gt; Ed6, Ed9, Ed6, Ed8, Ed9, Ed4, Ed8, Ed2, Ed6, Ed8, Ed7, Ed5…
-$ COUNTRY     &lt;fct&gt; UK, UK, UK, UK, UK, CA, US, UK, CA, UK, UK, OT, UK, CA, UK…
-$ ETHNICITY   &lt;fct&gt; WA, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH, WH…
-$ NSCORE      &lt;fct&gt; S39, S29, S31, S34, S43, S29, S31, S24, S42, S33, S26, S24…
-$ ESCORE      &lt;fct&gt; S36, S52, S45, S34, S28, S38, S32, S52, S55, S40, S45, S40…
-$ OSCORE      &lt;fct&gt; S42, S55, S40, S46, S43, S35, S43, S40, S39, S36, S38, S47…
-$ ASCORE      &lt;fct&gt; S37, S48, S32, S47, S41, S55, S41, S41, S48, S47, S38, S30…
-$ CSCORE      &lt;fct&gt; S42, S41, S34, S46, S50, S52, S48, S52, S49, S43, S53, S38…
-$ IMPULSIVITY &lt;fct&gt; I3, I2, I1, I1, I3, I1, I3, I4, I1, I1, I4, I5, I7, I2, I7…
-$ SS          &lt;fct&gt; SS02, SS05, SS07, SS02, SS05, SS01, SS06, SS04, SS01, SS03…
-$ ALCOHOL     &lt;fct&gt; CL5, CL5, CL6, CL4, CL4, CL2, CL6, CL5, CL4, CL6, CL5, CL5…
-$ AMPHET      &lt;fct&gt; CL2, CL2, CL0, CL0, CL1, CL0, CL0, CL0, CL0, CL1, CL0, CL1…
-$ AMYL        &lt;fct&gt; CL0, CL2, CL0, CL0, CL1, CL0, CL0, CL0, CL0, CL0, CL1, CL0…
-$ BENZOS      &lt;fct&gt; CL2, CL0, CL0, CL3, CL0, CL0, CL0, CL0, CL0, CL1, CL0, CL0…
-$ CAFF        &lt;fct&gt; CL6, CL6, CL6, CL5, CL6, CL6, CL6, CL6, CL6, CL6, CL6, CL6…
-$ CANNABIS    &lt;fct&gt; CL0, CL4, CL3, CL2, CL3, CL0, CL1, CL0, CL0, CL1, CL2, CL4…
-$ CHOC        &lt;fct&gt; CL5, CL6, CL4, CL4, CL6, CL4, CL5, CL4, CL6, CL6, CL5, CL5…
-$ COKE        &lt;fct&gt; CL0, CL3, CL0, CL2, CL0, CL0, CL0, CL0, CL0, CL0, CL2, CL2…
-$ CRACK       &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
-$ ECSTASY     &lt;fct&gt; CL0, CL4, CL0, CL0, CL1, CL0, CL0, CL0, CL0, CL0, CL0, CL3…
-$ HEROIN      &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
-$ KETAMINE    &lt;fct&gt; CL0, CL2, CL0, CL2, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
-$ LEGALH      &lt;fct&gt; CL0, CL0, CL0, CL0, CL1, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
-$ LSD         &lt;fct&gt; CL0, CL2, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1…
-$ METH        &lt;fct&gt; CL0, CL3, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
-$ MUSHROOMS   &lt;fct&gt; CL0, CL0, CL1, CL0, CL2, CL0, CL0, CL0, CL0, CL0, CL0, CL2…
-$ NICOTINE    &lt;fct&gt; CL2, CL4, CL0, CL2, CL2, CL6, CL6, CL0, CL6, CL6, CL2, CL6…
-$ SEMER       &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0…
-$ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1, CL0…</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>       ID          AGE      GENDER    EDUCATION   COUNTRY   ETHNICITY
- Min.   :   1.0   Ag1:643   F:942   Ed5    :506   AU:  54   AS:  26  
- 1st Qu.: 474.0   Ag2:481   M:943   Ed7    :480   CA:  87   BA:   3  
- Median : 946.0   Ag3:356           Ed8    :283   IE:  20   BL:  33  
- Mean   : 945.3   Ag4:294           Ed6    :270   NZ:   5   OT:  63  
- 3rd Qu.:1417.0   Ag5: 93           Ed4    :100   OT: 118   WA:  20  
- Max.   :1888.0   Ag6: 18           Ed2    : 99   UK:1044   WB:  20  
-                                    (Other):147   US: 557   WH:1720  
-     NSCORE         ESCORE         OSCORE         ASCORE         CSCORE    
- S31    :  87   S40    : 130   S46    : 134   S44    : 118   S46    : 113  
- S40    :  80   S41    : 116   S48    : 116   S41    : 114   S44    : 111  
- S32    :  78   S42    : 109   S47    : 107   S45    : 112   S45    : 111  
- S42    :  77   S39    : 107   S45    : 103   S43    : 105   S42    : 105  
- S34    :  76   S38    : 106   S44    : 101   S48    : 104   S41    :  99  
- S36    :  73   S43    : 105   S49    :  98   S39    : 102   S40    :  97  
- (Other):1414   (Other):1212   (Other):1226   (Other):1230   (Other):1249  
-  IMPULSIVITY        SS      ALCOHOL   AMPHET     AMYL      BENZOS    
- I3     :355   SS07   :249   CL0: 34   CL0:976   CL0:1305   CL0:1000  
- I2     :307   SS05   :223   CL1: 34   CL1:230   CL1: 210   CL1: 116  
- I1     :276   SS06   :219   CL2: 68   CL2:243   CL2: 237   CL2: 234  
- I4     :257   SS04   :211   CL3:198   CL3:198   CL3:  92   CL3: 236  
- I5     :216   SS08   :211   CL4:287   CL4: 75   CL4:  24   CL4: 120  
- I6     :195   SS09   :210   CL5:759   CL5: 61   CL5:  14   CL5:  84  
- (Other):279   (Other):562   CL6:505   CL6:102   CL6:   3   CL6:  95  
-  CAFF      CANNABIS   CHOC      COKE      CRACK      ECSTASY    HEROIN    
- CL0:  27   CL0:413   CL0: 32   CL0:1038   CL0:1627   CL0:1021   CL0:1605  
- CL1:  10   CL1:207   CL1:  3   CL1: 160   CL1:  67   CL1: 113   CL1:  68  
- CL2:  24   CL2:266   CL2: 10   CL2: 270   CL2: 112   CL2: 234   CL2:  94  
- CL3:  60   CL3:211   CL3: 54   CL3: 258   CL3:  59   CL3: 277   CL3:  65  
- CL4: 106   CL4:140   CL4:296   CL4:  99   CL4:   9   CL4: 156   CL4:  24  
- CL5: 273   CL5:185   CL5:683   CL5:  41   CL5:   9   CL5:  63   CL5:  16  
- CL6:1385   CL6:463   CL6:807   CL6:  19   CL6:   2   CL6:  21   CL6:  13  
- KETAMINE   LEGALH      LSD        METH      MUSHROOMS NICOTINE  SEMER     
- CL0:1490   CL0:1094   CL0:1069   CL0:1429   CL0:982   CL0:428   CL0:1877  
- CL1:  45   CL1:  29   CL1: 259   CL1:  39   CL1:209   CL1:193   CL1:   2  
- CL2: 142   CL2: 198   CL2: 177   CL2:  97   CL2:260   CL2:204   CL2:   3  
- CL3: 129   CL3: 323   CL3: 214   CL3: 149   CL3:275   CL3:185   CL3:   2  
- CL4:  42   CL4: 110   CL4:  97   CL4:  50   CL4:115   CL4:108   CL4:   1  
- CL5:  33   CL5:  64   CL5:  56   CL5:  48   CL5: 40   CL5:157             
- CL6:   4   CL6:  67   CL6:  13   CL6:  73   CL6:  4   CL6:610             
-  VSA      
- CL0:1455  
- CL1: 200  
- CL2: 135  
- CL3:  61  
- CL4:  13  
- CL5:  14  
- CL6:   7  </code></pre>
-</div>
 <div class="cell-output-display">
-<div id="rrdsylyytb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#rrdsylyytb table {
+<div id="wdkoauqppx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#wdkoauqppx table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#rrdsylyytb thead, #rrdsylyytb tbody, #rrdsylyytb tfoot, #rrdsylyytb tr, #rrdsylyytb td, #rrdsylyytb th {
+#wdkoauqppx thead, #wdkoauqppx tbody, #wdkoauqppx tfoot, #wdkoauqppx tr, #wdkoauqppx td, #wdkoauqppx th {
   border-style: none;
 }
 
-#rrdsylyytb p {
+#wdkoauqppx p {
   margin: 0;
   padding: 0;
 }
 
-#rrdsylyytb .gt_table {
+#wdkoauqppx .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -212,12 +115,12 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-left-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_caption {
+#wdkoauqppx .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#rrdsylyytb .gt_title {
+#wdkoauqppx .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -229,7 +132,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-bottom-width: 0;
 }
 
-#rrdsylyytb .gt_subtitle {
+#wdkoauqppx .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -241,7 +144,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-top-width: 0;
 }
 
-#rrdsylyytb .gt_heading {
+#wdkoauqppx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -253,13 +156,13 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-right-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_bottom_border {
+#wdkoauqppx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_col_headings {
+#wdkoauqppx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -274,7 +177,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-right-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_col_heading {
+#wdkoauqppx .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -294,7 +197,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   overflow-x: hidden;
 }
 
-#rrdsylyytb .gt_column_spanner_outer {
+#wdkoauqppx .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -306,15 +209,15 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   padding-right: 4px;
 }
 
-#rrdsylyytb .gt_column_spanner_outer:first-child {
+#wdkoauqppx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rrdsylyytb .gt_column_spanner_outer:last-child {
+#wdkoauqppx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rrdsylyytb .gt_column_spanner {
+#wdkoauqppx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -326,11 +229,11 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   width: 100%;
 }
 
-#rrdsylyytb .gt_spanner_row {
+#wdkoauqppx .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#rrdsylyytb .gt_group_heading {
+#wdkoauqppx .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -356,7 +259,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   text-align: left;
 }
 
-#rrdsylyytb .gt_empty_group_heading {
+#wdkoauqppx .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -371,15 +274,15 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   vertical-align: middle;
 }
 
-#rrdsylyytb .gt_from_md > :first-child {
+#wdkoauqppx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rrdsylyytb .gt_from_md > :last-child {
+#wdkoauqppx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rrdsylyytb .gt_row {
+#wdkoauqppx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -398,7 +301,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   overflow-x: hidden;
 }
 
-#rrdsylyytb .gt_stub {
+#wdkoauqppx .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -411,7 +314,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   padding-right: 5px;
 }
 
-#rrdsylyytb .gt_stub_row_group {
+#wdkoauqppx .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -425,15 +328,15 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   vertical-align: top;
 }
 
-#rrdsylyytb .gt_row_group_first td {
+#wdkoauqppx .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#rrdsylyytb .gt_row_group_first th {
+#wdkoauqppx .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#rrdsylyytb .gt_summary_row {
+#wdkoauqppx .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -443,16 +346,16 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   padding-right: 5px;
 }
 
-#rrdsylyytb .gt_first_summary_row {
+#wdkoauqppx .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_first_summary_row.thick {
+#wdkoauqppx .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#rrdsylyytb .gt_last_summary_row {
+#wdkoauqppx .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -462,7 +365,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-bottom-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_grand_summary_row {
+#wdkoauqppx .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -472,7 +375,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   padding-right: 5px;
 }
 
-#rrdsylyytb .gt_first_grand_summary_row {
+#wdkoauqppx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -482,7 +385,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-top-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_last_grand_summary_row_top {
+#wdkoauqppx .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -492,11 +395,11 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-bottom-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_striped {
+#wdkoauqppx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#rrdsylyytb .gt_table_body {
+#wdkoauqppx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -505,7 +408,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-bottom-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_footnotes {
+#wdkoauqppx .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -519,7 +422,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-right-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_footnote {
+#wdkoauqppx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -528,7 +431,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   padding-right: 5px;
 }
 
-#rrdsylyytb .gt_sourcenotes {
+#wdkoauqppx .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -542,7 +445,7 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   border-right-color: #D3D3D3;
 }
 
-#rrdsylyytb .gt_sourcenote {
+#wdkoauqppx .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -550,72 +453,72 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
   padding-right: 5px;
 }
 
-#rrdsylyytb .gt_left {
+#wdkoauqppx .gt_left {
   text-align: left;
 }
 
-#rrdsylyytb .gt_center {
+#wdkoauqppx .gt_center {
   text-align: center;
 }
 
-#rrdsylyytb .gt_right {
+#wdkoauqppx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rrdsylyytb .gt_font_normal {
+#wdkoauqppx .gt_font_normal {
   font-weight: normal;
 }
 
-#rrdsylyytb .gt_font_bold {
+#wdkoauqppx .gt_font_bold {
   font-weight: bold;
 }
 
-#rrdsylyytb .gt_font_italic {
+#wdkoauqppx .gt_font_italic {
   font-style: italic;
 }
 
-#rrdsylyytb .gt_super {
+#wdkoauqppx .gt_super {
   font-size: 65%;
 }
 
-#rrdsylyytb .gt_footnote_marks {
+#wdkoauqppx .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#rrdsylyytb .gt_asterisk {
+#wdkoauqppx .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#rrdsylyytb .gt_indent_1 {
+#wdkoauqppx .gt_indent_1 {
   text-indent: 5px;
 }
 
-#rrdsylyytb .gt_indent_2 {
+#wdkoauqppx .gt_indent_2 {
   text-indent: 10px;
 }
 
-#rrdsylyytb .gt_indent_3 {
+#wdkoauqppx .gt_indent_3 {
   text-indent: 15px;
 }
 
-#rrdsylyytb .gt_indent_4 {
+#wdkoauqppx .gt_indent_4 {
   text-indent: 20px;
 }
 
-#rrdsylyytb .gt_indent_5 {
+#wdkoauqppx .gt_indent_5 {
   text-indent: 25px;
 }
 
-#rrdsylyytb .katex-display {
+#wdkoauqppx .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#rrdsylyytb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#wdkoauqppx div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -640,15 +543,15 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Category">Number of variables</td>
-<td class="gt_row gt_left" headers="Description">33</td>
+<td class="gt_row gt_left" headers="Description">36</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Category">Drug use definition</td>
-<td class="gt_row gt_left" headers="Description">User = respondent reported use of cannabis, coke, or ecstasy</td>
+<td class="gt_row gt_left" headers="Description">User = respondent reported use of cannabis, cocaine, or ecstasy</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="Category">Drug variables used for current prototype</td>
-<td class="gt_row gt_left" headers="Description">Cannabis, coke, ecstasy</td>
+<td class="gt_row gt_left" headers="Category">Drug variables used for this report</td>
+<td class="gt_row gt_left" headers="Description">Cannabis, cocaine, ecstasy</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Category">Demographic variables</td>
@@ -668,229 +571,110 @@ $ VSA         &lt;fct&gt; CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL0, CL1,
 </div>
 </div>
 </div>
-<p>This dataset contains individual survey responses about demographics, personality traits, and drug consumption. For this prototype, we define a respondent as a “User” if they reported any use of cannabis, coke, or ecstasy. This gives us a simplified outcome variable that lets us compare drug use patterns across demographic and psychological factors.</p>
-<!-- # Section 2: Baseline Drug Use Patterns 
-Communication Goal -> Establish the basic question: who reports drug use at all? -->
-<!-- END OF section 1 & 2 ---------------------------------------------------------------------------    -->
-<!-- section 4 -->
-<!-- end of section 4 -->
-<!-- start of section 5 -->
-<!-- end of section 5 -->
-<div class="cr-section">
-<div class="narrative">
-<section id="section-2-baseline-drug-use-patterns" class="level2">
-<h2 class="anchored" data-anchor-id="section-2-baseline-drug-use-patterns">Section 2: Baseline Drug Use Patterns</h2>
 </section>
-<section id="lets-establish-the-basic-question-who-reports-drug-use-at-all" class="level2">
-<h2 class="anchored" data-anchor-id="lets-establish-the-basic-question-who-reports-drug-use-at-all">Lets establish the basic question: who reports drug use at all?</h2>
+<section id="establishing-the-baseline" class="level2">
+<h2 class="anchored" data-anchor-id="establishing-the-baseline">Establishing the Baseline</h2>
+<p><em>Communication Goal: Define the outcome variable and show how common reported drug use is before comparing groups.</em></p>
+<p>Before examining differences across groups, it is important to establish how common reported drug use is within the dataset overall. Nearly 80% of respondents reported some use of cannabis, cocaine, or ecstasy, placing them in the “User” category. This suggests that drug experimentation or occasional use is relatively common within this survey population and provides the foundation for comparing how usage varies across demographic and psychological characteristics.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_draft_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-</div>
-<p>This graph establishes the baseline distribution of drug usage within the dataset using our simplified classification system. Respondents were categorized as “Users” if they reported any cannabis, coke, or ecstasy use, while all others were labeled “Non-users.” Almost 80% of respondents fall into the “User” category, suggesting that some level of reported drug use is relatively common within this survey population. This baseline helps contextualize the demographic and personality-based patterns explored in later sections of the project. <span class="citation" data-cites="cr-overall">@cr-overall</span></p>
-<div id="cr-overall">
+<section id="demographics-matter-but-only-so-much" class="level2">
+<h2 class="anchored" data-anchor-id="demographics-matter-but-only-so-much">Demographics Matter, But Only So Much</h2>
+<p><em>Communication Goal: Show that age and gender create clear population-level differences, but do not fully explain drug use patterns.</em></p>
+<p>Drug use is not evenly distributed across the population. Age and gender produce some of the clearest demographic differences, with younger respondents and men reporting higher levels of use overall. However, these demographic patterns alone do not fully explain variation in drug use behavior.</p>
+<p>Across both genders, reported drug use is highest among younger respondents and steadily declines with age. Male respondents consistently report higher levels of use across most age groups, though the decline with age is visible for both men and women. The graph suggests that drug use is associated not only with gender, but also with life stage and generational differences in social behavior, experimentation, and exposure.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final_draft_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
 </div>
-</div>
-<p>This graph shows a strong relationship between age and reported drug use within the survey population. Respondents in the youngest age group, 18–24, had the highest share of reported drug use, with usage steadily decreasing across older age groups. By the 65+ category, non-users make up the majority of respondents. This pattern suggests that younger individuals in the dataset are substantially more likely to report drug use than older respondents, making age one of the clearest demographic trends in the project. <span class="citation" data-cites="cr-age">@cr-age</span></p>
-<div id="cr-age">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<p>This graph shows noticeable differences in reported drug use across gender groups within the dataset. Male respondents report higher levels of drug use overall, with almost 90% categorized as “Users,” compared to a lower share among female respondents. While both groups contain a majority of users, the gap suggests that gender may play a role in reported drug consumption patterns. Together with the age analysis, this graph helps establish demographic trends before exploring more detailed personality-based relationships later in the project. <span class="citation" data-cites="cr-gender">@cr-gender</span></p>
-<div id="cr-gender">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<p>This graph combines the project’s two strongest demographic patterns: age and gender. Across both male and female respondents, reported drug use is highest among younger age groups and generally declines with age. However, the decline is more pronounced among female respondents, where the proportion of non-users increases substantially in older age categories. Male respondents consistently report higher levels of drug use across nearly every age group. By comparing both demographics simultaneously, this visualization shows that age-related patterns remain visible across genders while also highlighting an overall gender gap in reported drug use. <span class="citation" data-cites="cr-agegender">@cr-agegender</span></p>
-<div id="cr-agegender">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div class="narrative">
-<section id="section-3-education-and-drug-use" class="level2">
-<h2 class="anchored" data-anchor-id="section-3-education-and-drug-use">Section 3: Education and Drug Use</h2>
 </section>
-<section id="does-socialdemographic-structure-beyond-age-and-gender-relate-to-drug-use" class="level2">
-<h2 class="anchored" data-anchor-id="does-socialdemographic-structure-beyond-age-and-gender-relate-to-drug-use">Does social/demographic structure beyond age and gender relate to drug use?</h2>
+<section id="education-is-more-complicated-than-it-looks" class="level2">
+<h2 class="anchored" data-anchor-id="education-is-more-complicated-than-it-looks">Education Is More Complicated Than It Looks</h2>
+<p><em>Communication Goal: Demonstrate why education should be interpreted carefully because it overlaps with age and life stage.</em></p>
+<p>While age and gender show relatively clear trends, education produces a more complicated pattern. At first glance, some education groups appear more likely to report drug use than others. However, education is closely connected to age, making it difficult to separate whether the observed differences reflect educational attainment itself or simply the fact that some groups contain younger respondents.</p>
+<p>When education is compared within age groups, the relationship becomes less straightforward. Some differences remain visible, but the patterns are far weaker and less consistent than those observed for age. This suggests that education alone may not be a strong predictor of drug use behavior and that other factors beyond demographics may play a larger role.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_draft_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-</div>
-<p>Education gives a more complex view of drug use because it may reflect age, opportunity, social environment, or life stage. Rather than showing a simple linear pattern, this graph helps us ask whether certain education groups report higher or lower drug use. <span class="citation" data-cites="cr-education">@cr-education</span></p>
-<div id="cr-education">
+<section id="which-drugs-are-actually-driving-drug-use" class="level2">
+<h2 class="anchored" data-anchor-id="which-drugs-are-actually-driving-drug-use">Which Drugs Are Actually Driving “Drug Use”?</h2>
+<p><em>Communication Goal: Clarify what “drug use” means in the dataset by separating commonly normalized substances from less common illicit ones.</em></p>
+<p>Not all drugs contribute equally to reported usage patterns. Legal and socially normalized substances such as caffeine, alcohol, chocolate, and nicotine dominate the dataset, while many illegal substances are used by substantially smaller portions of respondents. Cannabis stands out as the most widely reported illicit drug. This distinction matters because it shows that “drug use” in the dataset ranges from highly normalized everyday consumption to far less common recreational or experimental substances.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final_draft_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
 </div>
-</div>
-<p>Because education level is closely tied to age, we include this graph to avoid over-interpreting education alone. If some education categories contain more young respondents, then higher drug use in those groups may partly reflect age rather than education itself. <span class="citation" data-cites="cr-education-age">@cr-education-age</span></p>
-<div id="cr-education-age">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<p>This graph makes the education section more careful and convincing. By comparing education levels within age groups, we can see whether education still appears related to drug use after accounting for age differences. <span class="citation" data-cites="cr-education-age-drug">@cr-education-age-drug</span></p>
-<div id="cr-education-age-drug">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div class="narrative">
-<section id="section-4-which-drugs-are-most-common" class="level2">
-<h2 class="anchored" data-anchor-id="section-4-which-drugs-are-most-common">Section 4: Which Drugs are Most Common?</h2>
 </section>
-<section id="lets-examine-which-drugs-are-most-commonly-reported." class="level2">
-<h2 class="anchored" data-anchor-id="lets-examine-which-drugs-are-most-commonly-reported.">Let’s examine which drugs are most commonly reported.</h2>
+<section id="personality-explains-the-strongest-patterns" class="level2">
+<h2 class="anchored" data-anchor-id="personality-explains-the-strongest-patterns">Personality Explains the Strongest Patterns</h2>
+<p><em>Communication Goal: Show that behavioral traits, especially sensation seeking, create stronger and more consistent differences than demographics.</em></p>
+<p>The demographic patterns explored earlier help explain who is more likely to report drug use, but they do not fully explain why. The strongest and most consistent differences in the dataset emerge when looking at psychological and behavioral traits, particularly those associated with risk-taking, novelty-seeking, and impulsive behavior.</p>
+<p>Sensation seeking shows the clearest relationship with reported drug use in the entire project. As sensation-seeking scores increase, the proportion of users rises dramatically. Lower-scoring groups contain much larger shares of non-users, while higher-scoring groups are overwhelmingly dominated by users. Compared with demographic variables such as age or education, the relationship here is both stronger and more consistent, suggesting that personality traits may be more predictive of drug use behavior than demographic background alone.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_draft_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The broader personality traits reinforce this pattern. Openness, extraversion, and neuroticism tend to be associated with higher reported drug use, while conscientiousness shows the opposite trend. Unlike demographic variables, which often produce moderate differences, these psychological traits reveal more directional and behaviorally meaningful patterns. Together, the results suggest that drug use may be closely tied to underlying behavioral tendencies such as curiosity, emotional regulation, and willingness to engage in risk-taking behavior.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_draft_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-</div>
-<p>Drug use is a broad term. This graph establishes that the most commonly used drugs across respondents is caffeine, chocolate, and alchol, with almost an 100% rate. As such, this data demonstrates that most people who answer the survey will be categorized as a drug user. Over 75% of users reported consuming cannabis and nicotine and many of the illegal drugs reported a lower percentage of users. These patterns suggest that the most commonly used substances are typically legal and easy to obtain. It also demonstrates a social aspect to drug usage as the majority of the most commonly used drugs are socially acceptable to consume. <span class="citation" data-cites="cr-drugtotal">@cr-drugtotal</span></p>
-<div id="cr-drugtotal">
+<section id="what-matters-most" class="level2">
+<h2 class="anchored" data-anchor-id="what-matters-most">What Matters Most?</h2>
+<p><em>Communication Goal: Compare the strongest relationships side by side to reveal which factors appear most important overall.</em></p>
+<p>The final graph summarizes which variables show the largest differences in reported drug use across the dataset. While demographic factors like age, gender, and education help explain some variation, personality and psychological traits — especially sensation seeking and impulsivity — appear to show the strongest relationships with reported drug use. Overall, the project suggests that drug use behavior may be shaped not only by demographic background, but also by deeper behavioral and psychological tendencies.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final_draft_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
 </div>
-</div>
-<p>This graph shows that most drugs are not used frequently. However, if respondents are using certain drugs with a frequency, those drugs tend to be alcohol, caffeine, cannabis, chocolate, and nicotine. As shown with the drug use graph, this data helps to reinforce that socially acceptable, legal drugs are utilized more. This graph also helps to show a difference between reporting use of a drug and actually consuming it regularly. While an individual may report consuming a drug, it may be experimental (once or twice) rather than frequent. Some drugs may also have less people using them, but they are using them with more frequency - like mushrooms or ecstasy. <span class="citation" data-cites="cr-drugfrequency">@cr-drugfrequency</span></p>
-<div id="cr-drugfrequency">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<section id="section-5-personality-traits-drug-use" class="level2 narrative">
-<h2 class="anchored" data-anchor-id="section-5-personality-traits-drug-use">Section 5: Personality Traits &amp; Drug Use</h2>
 </section>
-<p>This graph shows one of the clearest relationships in the project. As sensation-seeking scores increase, the proportion of respondents reporting drug use rises substantially. Lower sensation-seeking groups contain larger shares of non-users, while higher-scoring groups are dominated by users. Compared with the earlier demographic graphs, the pattern here appears stronger and more consistent, suggesting that personality traits may explain drug use behavior more effectively than age or gender alone. <span class="citation" data-cites="cr-sensation">@cr-sensation</span></p>
-<div id="cr-sensation">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<p>Impulsivity shows a similar pattern to sensation seeking, though the relationship appears somewhat weaker. Respondents with higher impulsivity scores generally report higher levels of drug use, while lower-scoring groups contain larger shares of non-users. Together, these two graphs suggest that behavioral and psychological tendencies may be closely connected to reported drug consumption patterns. <span class="citation" data-cites="cr-impulsive">@cr-impulsive</span></p>
-<div id="cr-impulsive">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<p>The five NEO personality traits show that psychological dimensions do not all relate to drug use in the same way. Some traits display clearer directional patterns, while others remain relatively flat or inconsistent across score ranges. Openness, extraversion, and neuroticism appear more positively associated with reported drug use, while conscientiousness tends to show the opposite pattern. The variation across traits reinforces the idea that personality may provide deeper insight into drug-use behavior than demographic categories alone. <span class="citation" data-cites="cr-personality">@cr-personality</span></p>
-<div id="cr-personality">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<section id="section-6-personality-traits-by-specific-drugs" class="level2 narrative">
-<h2 class="anchored" data-anchor-id="section-6-personality-traits-by-specific-drugs">Section 6: Personality Traits by Specific Drugs</h2>
-</section>
-<p>The previous section showed how sensation-seeking is strongly associated with overall drug use. This graph looks more closely at whether that relationship looks equal across the different substances. Instead of treating drug use as just one broad category on its own, this graph compares the reported use of cannabis, cocaine, ecstasy, mushrooms, and other substances across their sensation-seeking scores. This will show whether certain drugs rise more sharply among higher sensation-seeking respondents. <span class="citation" data-cites="cr-sensation-drugs">@cr-sensation-drugs</span></p>
-<div id="cr-sensation-drugs">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<p>This heatmap expands the comparison across multiple personality traits and substances. Each cell shows the difference in the reported use between respondents with higher scores vs.&nbsp;lower scores for that trait. Positive values mean use is more common among higher-scoring respondents, while negative values mean that use is more common among lower-scoring ones. This makes it easier to see which combinations of traits and drugs stand out. <span class="citation" data-cites="cr-trait-drug">@cr-trait-drug</span></p>
-<div id="cr-trait-drug">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<section id="section-7-conclusion" class="level2 narrative">
-<h2 class="anchored" data-anchor-id="section-7-conclusion">Section 7: Conclusion</h2>
-</section>
-<p>The final graph summarizes which variables show the largest differences in reported drug use across the dataset. While demographic factors like age, gender, and education help explain some variation, personality and psychological traits — especially sensation seeking and impulsivity — appear to show the strongest relationships with reported drug use. Overall, the project suggests that drug use behavior may be shaped not only by demographic background, but also by deeper behavioral and psychological tendencies. <span class="citation" data-cites="cr-summary">@cr-summary</span></p>
-<div id="cr-summary">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_ini_v2_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</div>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p><em>Communication Goal: Tie the findings together and explain the broader takeaway: personality adds meaning beyond demographic categories.</em></p>
+<p>This project began with a simple question: who reports drug use within this survey population? Initial demographic analysis showed clear differences across age and gender, with younger respondents and men generally reporting higher levels of use. However, as the analysis moved beyond demographics, personality traits emerged as the strongest and most consistent predictors of reported drug use.</p>
+<p>In particular, sensation seeking demonstrated a far stronger relationship with drug use than education or many demographic categories. Other personality dimensions, including openness and conscientiousness, also revealed meaningful behavioral patterns tied to experimentation and risk-taking. These findings suggest that drug use behavior may reflect deeper psychological tendencies rather than demographic background alone.</p>
+<p>More broadly, the project highlights the importance of moving beyond surface-level explanations when analyzing human behavior. While demographics provide useful context, psychological and behavioral characteristics may offer a more complete understanding of why individuals differ in their likelihood of engaging in drug use.</p>
 </section>
 
 </main>

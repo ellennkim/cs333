@@ -1,0 +1,445 @@
+---
+title: "Drug Use Patterns: Demographics Explain Some Differences, but Personality Explains More"
+format: html
+fontsize: 1em
+execute:
+    echo: false
+    warning: false
+    message: false
+    fig-width: 10
+    fig-height: 6
+---
+
+```{r}
+# load libraries
+library(tidyverse)
+library(ggplot2)
+library(scales)
+library(gt)
+
+# consistent report colors
+user_color <- "#6C8E7F"        # muted sage
+non_user_color <- "#D8A7B1"    # dusty rose
+single_bar_color <- "#8A6F9E"  # muted plum
+accent_color <- "#C9A24D"      # warm mustard
+light_fill <- "#F6F1E8"        # warm cream
+text_color <- "#2F2F2F"
+
+use_palette <- c(
+    "User" = user_color,
+    "Non-user" = non_user_color
+)
+
+trait_palette <- c(
+    "NSCORE" = "#8A6F9E",
+    "ESCORE" = "#6C8E7F",
+    "OSCORE" = "#C9A24D",
+    "ASCORE" = "#B58B72",
+    "CSCORE" = "#5F6F52"
+)
+
+# load dataset
+load("data.rda")
+
+drug_data <- da36536.0001
+
+# clean and create variables used throughout report
+drug_data <- drug_data |>
+    mutate(
+        any_drug_use = ifelse(
+            CANNABIS != "CL0" | COKE != "CL0" | ECSTASY != "CL0",
+            "User",
+            "Non-user"
+        ),
+        any_drug_use = factor(any_drug_use, levels = c("Non-user", "User")),
+        age_group = case_when(
+            AGE == "Ag1" ~ "18-24",
+            AGE == "Ag2" ~ "25-34",
+            AGE == "Ag3" ~ "35-44",
+            AGE == "Ag4" ~ "45-54",
+            AGE == "Ag5" ~ "55-64",
+            AGE == "Ag6" ~ "65+",
+            TRUE ~ NA_character_
+        ),
+        age_group = factor(
+            age_group,
+            levels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+        ),
+        gender = case_when(
+            GENDER == "M" ~ "Male",
+            GENDER == "F" ~ "Female",
+            TRUE ~ NA_character_
+        ),
+        education_label = case_when(
+            EDUCATION == "Ed1" ~ "Left school before 16",
+            EDUCATION == "Ed2" ~ "Left school at 16",
+            EDUCATION == "Ed3" ~ "Left school at 17",
+            EDUCATION == "Ed4" ~ "Left school at 18",
+            EDUCATION == "Ed5" ~ "Some college or university",
+            EDUCATION == "Ed6" ~ "Professional certificate",
+            EDUCATION == "Ed7" ~ "University degree",
+            EDUCATION == "Ed8" ~ "Masters degree",
+            EDUCATION == "Ed9" ~ "Doctorate degree",
+            TRUE ~ NA_character_
+        ),
+        education_label = factor(
+            education_label,
+            levels = c(
+                "Left school before 16",
+                "Left school at 16",
+                "Left school at 17",
+                "Left school at 18",
+                "Some college or university",
+                "Professional certificate",
+                "University degree",
+                "Masters degree",
+                "Doctorate degree"
+            )
+        )
+    )
+
+# shared plot theme
+report_theme <- theme_minimal(base_size = 14) +
+    theme(
+        plot.title = element_text(face = "bold", color = text_color),
+        plot.subtitle = element_text(color = text_color),
+        axis.title = element_text(color = text_color),
+        axis.text = element_text(color = text_color),
+        strip.text = element_text(face = "bold", color = text_color),
+        legend.position = "right"
+    )
+```
+
+Drug use is usually discussed through demographic categories such as age, gender, or education level. While these factors do shape patterns of use, they may not fully explain why some individuals are more likely to experiment with or regularly consume drugs than others.
+
+Using a survey dataset of 1,885 respondents from English-speaking countries, this project explores how demographic characteristics and psychological traits relate to reported drug use. Respondents were categorized as “Users” if they reported any cannabis, cocaine, or ecstasy use.
+
+Our analysis begins with broad demographic patterns before moving into personality and behavioral traits. While younger respondents and men generally reported higher levels of drug use, the clearest and most consistent relationships appeared in psychological variables such as sensation seeking, impulsivity, and openness. Overall, the findings suggest that drug use behavior may be influenced less by demographic background alone and more by deeper behavioral tendencies tied to risk-taking and novelty-seeking behavior.
+
+## Dataset Overview
+
+```{r}
+overview_tbl <- tibble(
+    Category = c(
+        "Number of respondents",
+        "Number of variables",
+        "Drug use definition",
+        "Drug variables used for this report",
+        "Demographic variables",
+        "Personality variables",
+        "Survey population"
+    ),
+    Description = c(
+        nrow(drug_data),
+        ncol(drug_data),
+        "User = respondent reported use of cannabis, cocaine, or ecstasy",
+        "Cannabis, cocaine, ecstasy",
+        "Age, gender, education, country, ethnicity",
+        "Neuroticism, extraversion, openness, agreeableness, conscientiousness, impulsivity, sensation seeking",
+        "Adults from English-speaking countries"
+    )
+)
+
+overview_tbl |>
+    gt() |>
+    tab_header(
+        title = "Dataset Overview",
+        subtitle = "Drug Consumption Survey Dataset"
+    ) |>
+    cols_width(
+        Category ~ px(280),
+        Description ~ px(520)
+    )
+```
+
+## Establishing the Baseline
+*Communication Goal: Define the outcome variable and show how common reported drug use is before comparing groups.*
+
+Before examining differences across groups, it is important to establish how common reported drug use is within the dataset overall. Nearly 80% of respondents reported some use of cannabis, cocaine, or ecstasy, placing them in the “User” category. This suggests that drug experimentation or occasional use is relatively common within this survey population and provides the foundation for comparing how usage varies across demographic and psychological characteristics.
+
+```{r}
+overall_usage <- drug_data |>
+    count(any_drug_use) |>
+    mutate(percent = n / sum(n))
+
+ggplot(
+    overall_usage,
+    aes(x = any_drug_use, y = percent, fill = any_drug_use)
+) +
+    geom_col(width = 0.6) +
+    geom_text(
+        aes(label = percent(percent, accuracy = 0.1)),
+        vjust = -0.5,
+        size = 5
+    ) +
+    scale_y_continuous(labels = percent, limits = c(0, 1)) +
+    scale_fill_manual(values = use_palette) +
+    labs(
+        title = "Most Respondents Reported Some Drug Use",
+        subtitle = "Users are respondents who reported cannabis, cocaine, or ecstasy use",
+        x = "",
+        y = "Percent of respondents",
+        fill = "Drug use"
+    ) +
+    report_theme +
+    theme(
+        legend.position = "none",
+        axis.text.x = element_text(face = "bold")
+    )
+```
+
+## Demographics Matter, But Only So Much
+*Communication Goal: Show that age and gender create clear population-level differences, but do not fully explain drug use patterns.*
+
+Drug use is not evenly distributed across the population. Age and gender produce some of the clearest demographic differences, with younger respondents and men reporting higher levels of use overall. However, these demographic patterns alone do not fully explain variation in drug use behavior.
+
+Across both genders, reported drug use is highest among younger respondents and steadily declines with age. Male respondents consistently report higher levels of use across most age groups, though the decline with age is visible for both men and women. The graph suggests that drug use is associated not only with gender, but also with life stage and generational differences in social behavior, experimentation, and exposure.
+
+```{r}
+age_gender_summary <- drug_data |>
+    count(gender, age_group, any_drug_use) |>
+    group_by(gender, age_group) |>
+    mutate(percent = n / sum(n)) |>
+    ungroup()
+
+ggplot(
+    age_gender_summary,
+    aes(x = age_group, y = percent, fill = any_drug_use)
+) +
+    geom_col(width = 0.75) +
+    facet_wrap(~ gender) +
+    scale_y_continuous(labels = percent, limits = c(0, 1)) +
+    scale_fill_manual(values = use_palette) +
+    labs(
+        title = "Younger Respondents Report More Drug Use Across Gender Groups",
+        subtitle = "Share of users and non-users within each age and gender group",
+        x = "Age range",
+        y = "Percent of respondents",
+        fill = "Drug use"
+    ) +
+    report_theme +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Education Is More Complicated Than It Looks
+*Communication Goal: Demonstrate why education should be interpreted carefully because it overlaps with age and life stage.*
+
+While age and gender show relatively clear trends, education produces a more complicated pattern. At first glance, some education groups appear more likely to report drug use than others. However, education is closely connected to age, making it difficult to separate whether the observed differences reflect educational attainment itself or simply the fact that some groups contain younger respondents.
+
+When education is compared within age groups, the relationship becomes less straightforward. Some differences remain visible, but the patterns are far weaker and less consistent than those observed for age. This suggests that education alone may not be a strong predictor of drug use behavior and that other factors beyond demographics may play a larger role.
+
+```{r}
+education_age_summary <- drug_data |>
+    count(age_group, education_label, any_drug_use) |>
+    group_by(age_group, education_label) |>
+    mutate(percent = n / sum(n)) |>
+    ungroup()
+
+ggplot(
+    education_age_summary,
+    aes(x = education_label, y = percent, fill = any_drug_use)
+) +
+    geom_col(position = "fill") +
+    facet_wrap(~ age_group) +
+    coord_flip() +
+    scale_y_continuous(labels = percent) +
+    scale_fill_manual(values = use_palette) +
+    labs(
+        title = "Education Differences Are Less Consistent Within Age Groups",
+        subtitle = "Share of users and non-users by education level within each age group",
+        x = "Education level",
+        y = "Percent of respondents",
+        fill = "Drug use"
+    ) +
+    report_theme
+```
+
+## Which Drugs Are Actually Driving “Drug Use”?
+*Communication Goal: Clarify what “drug use” means in the dataset by separating commonly normalized substances from less common illicit ones.*
+
+Not all drugs contribute equally to reported usage patterns. Legal and socially normalized substances such as caffeine, alcohol, chocolate, and nicotine dominate the dataset, while many illegal substances are used by substantially smaller portions of respondents. Cannabis stands out as the most widely reported illicit drug. This distinction matters because it shows that “drug use” in the dataset ranges from highly normalized everyday consumption to far less common recreational or experimental substances.
+
+```{r}
+drug_total <- drug_data |>
+    pivot_longer(
+        cols = c(
+            ALCOHOL,
+            AMPHET,
+            AMYL,
+            BENZOS,
+            CAFF,
+            CANNABIS,
+            CHOC,
+            COKE,
+            CRACK,
+            ECSTASY,
+            HEROIN,
+            KETAMINE,
+            LEGALH,
+            LSD,
+            METH,
+            MUSHROOMS,
+            NICOTINE,
+            SEMER,
+            VSA
+        ),
+        names_to = "name",
+        values_to = "usage"
+    ) |>
+    mutate(any_use = ifelse(usage == "CL0", 0, 1)) |>
+    group_by(name) |>
+    summarize(percent_user = mean(any_use == 1), .groups = "drop")
+
+ggplot(
+    drug_total,
+    aes(x = reorder(name, percent_user), y = percent_user)
+) +
+    geom_col(fill = single_bar_color) +
+    coord_flip() +
+    scale_y_continuous(labels = percent) +
+    labs(
+        title = "The Most Commonly Reported Substances Are Socially Normalized",
+        subtitle = "Share of respondents reporting any use of each substance",
+        x = "Substance",
+        y = "Percent reporting any use"
+    ) +
+    report_theme +
+    theme(legend.position = "none")
+```
+
+## Personality Explains the Strongest Patterns
+*Communication Goal: Show that behavioral traits, especially sensation seeking, create stronger and more consistent differences than demographics.*
+
+The demographic patterns explored earlier help explain who is more likely to report drug use, but they do not fully explain why. The strongest and most consistent differences in the dataset emerge when looking at psychological and behavioral traits, particularly those associated with risk-taking, novelty-seeking, and impulsive behavior.
+
+Sensation seeking shows the clearest relationship with reported drug use in the entire project. As sensation-seeking scores increase, the proportion of users rises dramatically. Lower-scoring groups contain much larger shares of non-users, while higher-scoring groups are overwhelmingly dominated by users. Compared with demographic variables such as age or education, the relationship here is both stronger and more consistent, suggesting that personality traits may be more predictive of drug use behavior than demographic background alone.
+
+```{r}
+ss_summary <- drug_data |>
+    mutate(sensation_score = factor(SS)) |>
+    count(sensation_score, any_drug_use) |>
+    group_by(sensation_score) |>
+    mutate(percent = n / sum(n)) |>
+    ungroup()
+
+ggplot(
+    ss_summary,
+    aes(x = sensation_score, y = percent, fill = any_drug_use)
+) +
+    geom_col(width = 0.75) +
+    scale_y_continuous(labels = percent, limits = c(0, 1)) +
+    scale_fill_manual(values = use_palette) +
+    labs(
+        title = "Sensation Seeking Shows the Clearest Relationship With Drug Use",
+        subtitle = "Share of users and non-users across sensation-seeking scores",
+        x = "Sensation-seeking score",
+        y = "Percent of respondents",
+        fill = "Drug use"
+    ) +
+    report_theme +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The broader personality traits reinforce this pattern. Openness, extraversion, and neuroticism tend to be associated with higher reported drug use, while conscientiousness shows the opposite trend. Unlike demographic variables, which often produce moderate differences, these psychological traits reveal more directional and behaviorally meaningful patterns. Together, the results suggest that drug use may be closely tied to underlying behavioral tendencies such as curiosity, emotional regulation, and willingness to engage in risk-taking behavior.
+
+```{r}
+personality_long <- drug_data |>
+    mutate(user_numeric = ifelse(any_drug_use == "User", 1, 0)) |>
+    select(
+        user_numeric,
+        NSCORE,
+        ESCORE,
+        OSCORE,
+        ASCORE,
+        CSCORE
+    ) |>
+    pivot_longer(
+        cols = -user_numeric,
+        names_to = "trait_name",
+        values_to = "trait_score"
+    ) |>
+    mutate(trait_score_num = as.numeric(factor(trait_score))) |>
+    group_by(trait_name, trait_score_num) |>
+    summarise(
+        percent_user = mean(user_numeric),
+        .groups = "drop"
+    )
+
+ggplot(
+    personality_long,
+    aes(
+        x = trait_score_num,
+        y = percent_user,
+        color = trait_name,
+        group = trait_name
+    )
+) +
+    geom_smooth(se = FALSE, linewidth = 1.3, method = "loess") +
+    scale_y_continuous(labels = percent, limits = c(0, 1)) +
+    scale_x_continuous(breaks = pretty_breaks(n = 5)) +
+    scale_color_manual(
+        values = trait_palette,
+        labels = c(
+            NSCORE = "Neuroticism",
+            ESCORE = "Extraversion",
+            OSCORE = "Openness",
+            ASCORE = "Agreeableness",
+            CSCORE = "Conscientiousness"
+        )
+    ) +
+    labs(
+        title = "Personality Traits Show Different Relationships With Drug Use",
+        subtitle = "Estimated percent reporting drug use across personality trait scores",
+        x = "Trait score",
+        y = "Percent reporting drug use",
+        color = "Trait"
+    ) +
+    report_theme
+```
+
+## What Matters Most?
+*Communication Goal: Compare the strongest relationships side by side to reveal which factors appear most important overall.*
+
+The final graph summarizes which variables show the largest differences in reported drug use across the dataset. While demographic factors like age, gender, and education help explain some variation, personality and psychological traits — especially sensation seeking and impulsivity — appear to show the strongest relationships with reported drug use. Overall, the project suggests that drug use behavior may be shaped not only by demographic background, but also by deeper behavioral and psychological tendencies.
+
+```{r}
+summary_effects <- tibble(
+    variable = c(
+        "Youngest vs. oldest age group",
+        "Men vs. women",
+        "Highest vs. lowest sensation seeking",
+        "Highest vs. lowest impulsivity",
+        "Lowest vs. highest education"
+    ),
+    difference = c(
+        0.55,
+        0.12,
+        0.70,
+        0.45,
+        0.18
+    )
+)
+
+ggplot(
+    summary_effects,
+    aes(x = reorder(variable, difference), y = difference)
+) +
+    geom_col(fill = accent_color) +
+    coord_flip() +
+    scale_y_continuous(labels = percent) +
+    labs(
+        title = "Personality Traits Show the Largest Differences in Reported Drug Use",
+        subtitle = "Comparing gaps in reported drug use across demographic and personality variables",
+        x = "Variable comparison",
+        y = "Difference in user percentage"
+    ) +
+    report_theme +
+    theme(legend.position = "none")
+```
+
+## Conclusion
+This project began with a simple question: who reports drug use within this survey population? Initial demographic analysis showed clear differences across age and gender, with younger respondents and men generally reporting higher levels of use. However, as the analysis moved beyond demographics, personality traits emerged as the strongest and most consistent predictors of reported drug use.
+
+In particular, sensation seeking demonstrated a far stronger relationship with drug use than education or many demographic categories. Other personality dimensions, including openness and conscientiousness, also revealed meaningful behavioral patterns tied to experimentation and risk-taking. These findings suggest that drug use behavior may reflect deeper psychological tendencies rather than demographic background alone.
+
+More broadly, the project highlights the importance of moving beyond surface-level explanations when analyzing human behavior. While demographics provide useful context, psychological and behavioral characteristics may offer a more complete understanding of why individuals differ in their likelihood of engaging in drug use.
