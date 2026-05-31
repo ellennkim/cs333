@@ -1,5 +1,13 @@
 ---
-title: "Drug Use Patterns: Demographics Explain Some Differences, but Personality Explains More"
+title: "Drug Use Patterns"
+author:   
+  - "Rhea Kaw"
+  - "Isabel Gonzalez"
+  - "Ellen Kim"
+  - "Eshan Haq"
+  - "Donald Texeria"
+date: today
+subtitle: "CS 333: Information Visualization"
 format: html
 fontsize: 1em
 execute:
